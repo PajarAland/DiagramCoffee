@@ -142,7 +142,7 @@ function Login() {
             return;
         }
 
-        // 🔐 CSRF SAFE CHECK
+        // CSRF SAFE CHECK
         const ensureCSRF = async () => {
             const hasCookie = document.cookie.includes("XSRF-TOKEN");
 
@@ -161,10 +161,33 @@ function Login() {
                 password: trimmedPassword,
             });
 
+            // if (response.data.success) {
+            //     login(response.data.data);
+            //     navigate("/home");
+            // }
+
             if (response.data.success) {
-                login(response.data.data);
-                navigate("/home");
-            }
+                const user = response.data.data;
+
+                login(user);
+
+                localStorage.setItem("isLoggedIn", "true");
+
+                // redirect berdasarkan role (optional tapi bagus)
+                // if (user.role === "admin" || user.role === "super_admin") {
+                //     navigate("/dashboard");
+                // } else {
+                //     navigate("/home");
+                // }
+
+                if (user.role === "super_admin") {
+                    navigate("/superadmin/dashboard");
+                } else if (user.role === "admin") {
+                    navigate("/admin/dashboard");
+                } else {
+                    navigate("/home");
+                }
+        }
 
         } catch (error) {
             console.error(error);

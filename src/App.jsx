@@ -1,343 +1,380 @@
-// import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-// import Landing from "./pages/Landing";
-// import Login from "./pages/Login";
-// import Register from "./pages/Register";
-// import Home from "./pages/Home";
-// import SuperAdminDashboard from "./pages/SuperAdminDashboard";
-// import AdminDashboard from "./pages/AdminDashboard";
-// import ProtectedRoute from "./auth/ProtectedRoute";
-// import { AuthProvider } from "./context/AuthProvider";
-// import Cabang from "./pages/Cabang";
-// import Categories from "./pages/Categories";
-// import ItemMenu from "./pages/ItemMenu";
-// import AdminProductDetail from "./pages/AdminProductDetail";
-// import ProductDetail from "./pages/ProductDetail";
-// import Checkout from "./pages/Checkout";
-
-// // Import layouts
-// import SuperAdminLayout from "./components/layout/SuperAdminLayout.jsx";
-// import AdminLayout from "./components/layout/AdminLayout";
-// import CustomerLayout from "./components/layout/CustomerLayout.jsx";
-
-// function App() {
-//   return (
-//     <AuthProvider>
-//       <BrowserRouter>
-//         <Routes>
-//           {/* Public Routes */}
-//           <Route path="/" element={<Landing />} />
-//           <Route path="/login" element={<Login />} />
-//           <Route path="/register" element={<Register />} />
-
-//           {/* Customer Routes */}
-//           <Route
-//             path="/home"
-//             element={
-//               <CustomerLayout>
-//                 <Home />
-//               </CustomerLayout>
-//             }
-//           />
-
-//           <Route
-//             path="/productdetail/:id"
-//             element={
-//               <CustomerLayout>
-//                 <ProductDetail />
-//               </CustomerLayout>
-
-//             }
-//           />
-
-//           <Route
-//             path="/checkout"
-//             element={
-
-//                 <Checkout />
-
-//             }
-//           />
-
-//           {/* Super Admin Routes with Layout */}
-//           <Route
-//             path="/superadmin"
-//             element={
-//               <ProtectedRoute allowedRoles={["super_admin"]}>
-//                 <SuperAdminLayout />
-//               </ProtectedRoute>
-//             }
-//           >
-//             {/* Super Admin Dashboard */}
-//             <Route 
-//               path="dashboard" 
-//               element={<SuperAdminDashboard />} 
-//             />
-            
-//             {/* Super Admin Categories */}
-//             <Route 
-//               path="categories" 
-//               element={<Categories />} 
-//             />
-            
-//             {/* Super Admin Cabang */}
-//             <Route 
-//               path="cabang" 
-//               element={<Cabang />} 
-//             />
-            
-//             {/* Super Admin Item Menu */}
-//             <Route 
-//               path="item-menu" 
-//               element={<ItemMenu />} 
-//             />
-            
-//             {/* Default redirect for /superadmin */}
-//             <Route 
-//               index 
-//               element={<Navigate to="/superadmin/dashboard" replace />} 
-//             />
-//           </Route>
-
-//           {/* Admin Routes with Layout */}
-//           <Route
-//             path="/admin"
-//             element={
-//               <ProtectedRoute allowedRoles={["super_admin","admin"]}>
-//                 <AdminLayout />
-//               </ProtectedRoute>
-//             }
-//           >
-//             {/* Admin Dashboard */}
-//             <Route 
-//               path="dashboard" 
-//               element={<AdminDashboard />} 
-//             />
-            
-//             {/* Admin Product Detail */}
-//             <Route 
-//               path="menu-items/:id" 
-//               element={<AdminProductDetail />} 
-//             />
-            
-//             {/* Default redirect for /admin */}
-//             <Route 
-//               index 
-//               element={<Navigate to="/admin/dashboard" replace />} 
-//             />
-//           </Route>
-
-//           {/* Keep individual routes for backward compatibility (optional) */}
-//           <Route
-//             path="/superadmin/dashboard"
-//             element={
-//               <ProtectedRoute allowedRoles={["super_admin"]}>
-//                 <SuperAdminLayout>
-//                   <SuperAdminDashboard />
-//                 </SuperAdminLayout>
-//               </ProtectedRoute>
-//             }
-//           />
-
-//           <Route
-//             path="/superadmin/categories"
-//             element={
-//               <ProtectedRoute allowedRoles={["super_admin"]}>
-//                 <SuperAdminLayout>
-//                   <Categories />
-//                 </SuperAdminLayout>
-//               </ProtectedRoute>
-//             }
-//           />
-
-//           <Route
-//             path="/superadmin/cabang"
-//             element={
-//               <ProtectedRoute allowedRoles={["super_admin"]}>
-//                 <SuperAdminLayout>
-//                   <Cabang />
-//                 </SuperAdminLayout>
-//               </ProtectedRoute>
-//             }
-//           />
-
-//           <Route
-//             path="/superadmin/item-menu"
-//             element={
-//               <ProtectedRoute allowedRoles={["super_admin"]}>
-//                 <SuperAdminLayout>
-//                   <ItemMenu />
-//                 </SuperAdminLayout>
-//               </ProtectedRoute>
-//             }
-//           />
-
-//           <Route
-//             path="/admin/menu-items/:id"
-//             element={
-//               <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
-//                 <AdminLayout>
-//                   <AdminProductDetail />
-//                 </AdminLayout>
-//               </ProtectedRoute>
-//             }
-//           />
-//         </Routes>
-//       </BrowserRouter>
-//     </AuthProvider>
-//   );
-// }
-
-// export default App;
-
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
 import { AuthProvider } from "./context/AuthProvider";
+import { BranchProvider } from "./context/BranchProvider";
+
 import ProtectedRoute from "./auth/ProtectedRoute";
-
-/* PUBLIC */
-import Landing from "./pages/Landing";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-
-/* CUSTOMER */
-import Home from "./pages/Home";
-import ProductDetail from "./pages/ProductDetail";
-import Checkout from "./pages/Checkout";
-
-/* ADMIN */
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminProductDetail from "./pages/AdminProductDetail";
-
-/* SUPER ADMIN */
-import SuperAdminDashboard from "./pages/SuperAdminDashboard";
-import Categories from "./pages/Categories";
-import Cabang from "./pages/Cabang";
-import ItemMenu from "./pages/ItemMenu";
+import BranchGuard from "./auth/BranchGuard";
 
 /* LAYOUTS */
 import CustomerLayout from "./components/layout/CustomerLayout";
 import AdminLayout from "./components/layout/AdminLayout";
 import SuperAdminLayout from "./components/layout/SuperAdminLayout";
 
+/* ================= PUBLIC ================= */
+
+const Landing = lazy(() =>
+  import("./pages/public/Landing")
+);
+
+const Login = lazy(() =>
+  import("./pages/public/Login")
+);
+
+const Register = lazy(() =>
+  import("./pages/public/Register")
+);
+
+const Menu = lazy(() =>
+  import("./pages/public/Menu")
+);
+
+const OrderStatus = lazy(() =>
+  import("./pages/public/OrderStatus")
+);
+
+const ForgotPassword = lazy(() =>
+  import("./pages/public/ForgotPassword")
+);
+
+const ResetPassword = lazy(() =>
+  import("./auth/ResetPassword")
+);
+
+/* ================= CUSTOMER ================= */
+
+const Home = lazy(() =>
+  import("./pages/public/Home")
+);
+
+const EmailVerification = lazy(() =>
+  import("./auth/EmailVerification")
+);
+
+const ProductDetail = lazy(() =>
+  import("./pages/public/ProductDetail")
+);
+
+const Checkout = lazy(() =>
+  import("./pages/public/Checkout")
+);
+
+const Profile = lazy(() =>
+  import("./pages/user/Profile")
+);
+
+const Riwayat = lazy(() =>
+  import("./pages/user/Riwayat")
+);
+
+const Voucher = lazy(() =>
+  import("./pages/user/Voucher")
+);
+
+const MyVoucher = lazy(() =>
+  import("./pages/user/MyVoucher")
+);
+
+/* ================= ADMIN ================= */
+
+const Dashboard = lazy(() =>
+  import("./pages/admin/Dashboard")
+);
+
+const AdminProductDetail = lazy(() =>
+  import("./pages/super_admin/AdminProductDetail")
+);
+
+const BranchStock = lazy(() =>
+  import("./pages/admin/BranchStock")
+);
+
+const Kasir = lazy(() =>
+  import("./pages/admin/OrderHub")
+);
+
+const KasirOrder = lazy(() =>
+  import("./pages/admin/KasirOrder")
+);
+
+/* ================= SUPER ADMIN ================= */
+
+const Categories = lazy(() =>
+  import("./pages/super_admin/Categories")
+);
+
+const Cabang = lazy(() =>
+  import("./pages/super_admin/Cabang")
+);
+
+const ItemMenu = lazy(() =>
+  import("./pages/super_admin/ItemMenu")
+);
+
+const AdminCabang = lazy(() =>
+  import("./pages/super_admin/AdminCabang")
+);
+
+const BannerManagement = lazy(() =>
+  import("./pages/super_admin/BannerManagment")
+);
+
+const VoucherManagement = lazy(() =>
+  import("./pages/super_admin/VoucherManagement")
+);
+
 function App() {
+
   return (
     <AuthProvider>
-
-      <BrowserRouter>
-
-        <Routes>
-
-          {/* ================= PUBLIC ================= */}
-
-          <Route path="/" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* ================= CUSTOMER ================= */}
-
-          <Route
-            element={
-              <ProtectedRoute>
-                <CustomerLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/home" element={<Home />} />
-
-            <Route
-              path="/productdetail/:id"
-              element={<ProductDetail />}
-            />
-
-            <Route
-              path="/checkout"
-              element={<Checkout />}
-            />
-          </Route>
-
-          {/* ================= SUPER ADMIN ================= */}
-
-          <Route
-            path="/superadmin"
-            element={
-              <ProtectedRoute allowedRoles={["super_admin"]}>
-                <SuperAdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route
-              index
-              element={
-                <Navigate
-                  to="/superadmin/dashboard"
-                  replace
-                />
-              }
-            />
-
-            <Route
-              path="dashboard"
-              element={<SuperAdminDashboard />}
-            />
-
-            <Route
-              path="categories"
-              element={<Categories />}
-            />
-
-            <Route
-              path="cabang"
-              element={<Cabang />}
-            />
-
-            <Route
-              path="item-menu"
-              element={<ItemMenu />}
-            />
-          </Route>
-
-          {/* ================= ADMIN ================= */}
-
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute
-                allowedRoles={["admin", "super_admin"]}
+      <BranchProvider>
+        <BrowserRouter>
+          <Suspense
+            fallback={
+              <div
+                className="
+                  min-h-screen
+                  flex
+                  items-center
+                  justify-center
+                  bg-[#F8F5F0]
+                "
               >
-                <AdminLayout />
-              </ProtectedRoute>
+
+                <div
+                  className="
+                    w-10
+                    h-10
+                    border-4
+                    border-[#2F5231]/20
+                    border-t-[#2F5231]
+                    rounded-full
+                    animate-spin
+                  "
+                />
+
+              </div>
             }
           >
-            <Route
-              index
-              element={
-                <Navigate
-                  to="/admin/dashboard"
-                  replace
+
+            <Routes>
+              {/* ================= PUBLIC ================= */}
+              <Route
+                path="/"
+                element={<Landing />}
+              />
+
+              <Route
+                path="/login"
+                element={<Login />}
+              />
+
+              <Route
+                path="/register"
+                element={<Register />}
+              />
+
+              <Route
+                path="/email-verification"
+                element={<EmailVerification />}
+              />
+
+              <Route
+                path="/forgot-password"
+                element={<ForgotPassword />}
+              />
+
+              <Route
+                path="/reset-password"
+                element={<ResetPassword />}
+              />
+
+              <Route
+                path="/orders/:orderNumber"
+                element={<OrderStatus />}
+              />
+
+              {/* ================= PUBLIC CUSTOMER FLOW ================= */}
+              <Route
+                element={
+                  <BranchGuard>
+                    <CustomerLayout />
+                  </BranchGuard>
+                }
+              >
+
+                <Route
+                  path="/home"
+                  element={<Home />}
                 />
-              }
-            />
 
-            <Route
-              path="dashboard"
-              element={<AdminDashboard />}
-            />
+                <Route
+                  path="/productdetail/:id"
+                  element={<ProductDetail />}
+                />
 
-            <Route
-              path="menu-items/:id"
-              element={<AdminProductDetail />}
-            />
-          </Route>
+                <Route
+                  path="/menu"
+                  element={<Menu />}
+                />
 
-        </Routes>
+                <Route
+                  path="/checkout"
+                  element={<Checkout />}
+                />
 
-      </BrowserRouter>
+              </Route>
 
+              {/* ================= AUTH CUSTOMER ================= */}
+              <Route
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["customer"]}
+                  >
+                    <BranchGuard>
+                      <CustomerLayout />
+                    </BranchGuard>
+                  </ProtectedRoute>
+                }
+              >
+
+                <Route
+                  path="/profile"
+                  element={<Profile />}
+                />
+
+                <Route
+                  path="/history"
+                  element={<Riwayat />}
+                />
+
+                <Route
+                  path="/voucher"
+                  element={<Voucher />}
+                />
+
+                <Route
+                  path="/myvoucher"
+                  element={<MyVoucher />}
+                />
+
+              </Route>
+
+              {/* ================= SUPER ADMIN ================= */}
+              <Route
+                path="/superadmin"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={["super_admin"]}
+                  >
+                    <SuperAdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+
+                <Route
+                  index
+                  element={
+                    <Navigate
+                      to="/superadmin/dashboard"
+                      replace
+                    />
+                  }
+                />
+
+                <Route
+                  path="dashboard"
+                  element={<Dashboard />}
+                />
+
+                <Route
+                  path="categories"
+                  element={<Categories />}
+                />
+
+                <Route
+                  path="cabang"
+                  element={<Cabang />}
+                />
+
+                <Route
+                  path="admin-cabang"
+                  element={<AdminCabang />}
+                />
+
+                <Route
+                  path="item-menu"
+                  element={<ItemMenu />}
+                />
+
+                <Route
+                  path="banners"
+                  element={<BannerManagement />}
+                />
+
+                <Route
+                  path="vouchers"
+                  element={<VoucherManagement />}
+                />
+
+              </Route>
+
+              {/* ================= ADMIN ================= */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                      "super_admin",
+                    ]}
+                  >
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+
+                <Route
+                  index
+                  element={
+                    <Navigate
+                      to="/admin/dashboard"
+                      replace
+                    />
+                  }
+                />
+
+                <Route
+                  path="dashboard"
+                  element={<Dashboard />}
+                />
+
+                <Route
+                  path="menu-items/:id"
+                  element={<AdminProductDetail />}
+                />
+
+                <Route
+                  path="stock"
+                  element={<BranchStock />}
+                />
+
+                <Route
+                  path="orders"
+                  element={<Kasir />}
+                />
+
+                <Route
+                  path="orders/create"
+                  element={<KasirOrder />}
+                />
+
+              </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </BranchProvider>
     </AuthProvider>
   );
 }

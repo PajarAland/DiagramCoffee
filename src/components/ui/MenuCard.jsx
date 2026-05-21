@@ -1,67 +1,9 @@
-// function MenuCard({ item }) {
-
-//     const baseImageUrl = "http://localhost:8000/storage/";
-
-//     return (
-//         <div className="bg-white rounded-3xl overflow-hidden border w-full max-w-[280px]">
-//             <img
-//             src={`${baseImageUrl}${item.image_url}`}
-//             alt={item.name}
-//             className="w-full h-48 object-cover"
-//         />
-
-//             <div className="p-4">
-//                 <h3 className="text-xl font-medium">
-//                     {item.name}
-//                 </h3>
-
-//                 <p className="text-lg mt-2">
-//                     Rp{item.base_price.toLocaleString("id-ID")}
-//                 </p>
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default MenuCard;
-
-// function MenuCard({ item, onClick }) {
-
-//     const baseImageUrl = "http://localhost:8000/storage/";
-
-//     return (
-//         <button
-//             onClick={() => onClick?.(item)}
-//             className="bg-white rounded-3xl overflow-hidden border w-full max-w-[280px] text-left hover:scale-[1.02] transition"
-//         >
-//             <img
-//                 src={`${baseImageUrl}${item.image_url}`}
-//                 alt={item.name}
-//                 className="w-full h-48 object-cover"
-//             />
-
-//             <div className="p-4">
-//                 <h3 className="text-xl font-medium">
-//                     {item.name}
-//                 </h3>
-
-//                 <p className="text-lg mt-2">
-//                     Rp{item.base_price.toLocaleString("id-ID")}
-//                 </p>
-//             </div>
-//         </button>
-//     );
-// }
-
-// export default MenuCard;
-
 import { useState } from "react";
 import imagePlaceholder from "../../assets/mdi--image-outline.svg";
 
 function MenuCard({ item, onClick }) {
-    const baseImageUrl = "http://localhost:8000/storage/";
+    const baseImageUrl = `${import.meta.env.VITE_API_URL}/storage/`;
     const [imageError, setImageError] = useState(false);
-    // const [isHovered, setIsHovered] = useState(false);
 
     const handleImageError = () => {
         setImageError(true);
@@ -82,215 +24,88 @@ function MenuCard({ item, onClick }) {
         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
     };
 
+    const hasDiscount = item.final_price && Number(item.final_price) < Number(item.base_price);
+    const discountType = item.discount_type;
+    const discountPercentage = Number(item.discount_percentage);
+    const discountAmount = Number(item.discount_amount);
+    const finalPrice = Number(item.final_price || item.base_price);
+
     return (
-        // <div
-        //     onClick={() => onClick?.(item)}
-        //     className="bg-white rounded-2xl overflow-hidden border w-full 
-        //     max-w-[190px] min-h-[175px] lg:max-w-[280px] min-w-[160px] text-left 
-        //     hover:scale-[1.02] transition cursor-pointer"
-        // >
         <div
             onClick={() => onClick?.(item)}
-            className="bg-white rounded-2xl overflow-hidden border w-full 
-            min-h-[175px] text-left 
-            hover:scale-[1.02] transition cursor-pointer"
+            className="group bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:scale-[1.02] hover:border-[#2F5231]/20 transition-all duration-300 cursor-pointer w-full h-full flex flex-col"
         >
-            <div className="relative overflow-hidden bg-gray-100">
+            {/* Image Container */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                 {!imageError ? (
                     <img
                         src={`${baseImageUrl}${item.image_url}`}
                         alt={item.name || "Menu item"}
-                        className="w-full h-28 object-cover"
+                        className="w-full h-32 object-cover transition-transform duration-500 group-hover:scale-110"
                         onError={handleImageError}
                         loading="lazy"
                     />
                 ) : (
-                    <div className="w-full h-28 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-                        <img 
-                            src={imagePlaceholder} 
-                            alt="Placeholder" 
-                            className="w-12 h-12 object-cover" 
-                        />
+                    <div className="w-full h-32 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <img src={imagePlaceholder} alt="Placeholder" className="w-12 h-12 object-contain opacity-50" />
+                    </div>
+                )}
+                
+                {/* Badge - Optional */}
+                {item.is_popular && (
+                    <div className="absolute top-2 left-2 bg-[#2F5231] text-white text-xs font-medium px-2 py-0.5 rounded-full shadow-md">
+                        Populer
                     </div>
                 )}
             </div>
 
-            <div className="p-2 space-y-2">
-                <h3 className="pt-3 text-sm font-medium">
+            {/* Content Container */}
+            <div className="p-3 flex-1 flex flex-col">
+                {/* Title */}
+                <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 min-h-[2.5rem] group-hover:text-[#2F5231] transition-colors duration-200">
                     {truncateText(item.name, 35)}
                 </h3>
 
-                <div className="pt-2 pb-7 flex items-center justify-between border-t border-gray-100">
-                    <p className="text-xs text-[#2F5231]">
-                        {formatPrice(item.base_price)}
+                {/* Description - Optional */}
+                {item.description && (
+                    <p className="text-xs text-gray-400 mt-1 line-clamp-2 min-h-[2rem]">
+                        {truncateText(item.description, 40)}
                     </p>
+                )}
+
+                {/* Price Section */}
+                <div className="mt-3 pt-2 border-t border-gray-100">
+                    <div className="flex items-end justify-between gap-2">
+                        <div>
+                            {hasDiscount ? (
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <p className="text-xs text-gray-400 line-through">
+                                        {formatPrice(item.base_price)}
+                                    </p>
+
+                                    {discountType === "percentage" && (
+                                        <span className="text-[10px] font-semibold bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full">
+                                            -{discountPercentage}%
+                                        </span>
+                                    )}
+
+                                    {discountType === "fixed" && (
+                                        <span className="text-[10px] font-semibold bg-red-100 text-red-500 px-1.5 py-0.5 rounded-full">
+                                            Hemat {formatPrice(discountAmount)}
+                                        </span>
+                                    )}
+                                </div>
+                            ) : null}
+
+                            <p className="text-sm font-bold text-[#2F5231]">
+                                {formatPrice(finalPrice)}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            
         </div>
     );
 }
 
 export default MenuCard;
-
-// import { useState } from "react";
-
-// function MenuCard({ item, onClick }) {
-//     const baseImageUrl = "http://localhost:8000/storage/";
-//     const [imageError, setImageError] = useState(false);
-//     const [isHovered, setIsHovered] = useState(false);
-
-//     // Fallback image or placeholder when image fails to load
-//     const handleImageError = () => {
-//         setImageError(true);
-//     };
-
-//     // Format price with better handling
-//     const formatPrice = (price) => {
-//         if (!price && price !== 0) return "Price not available";
-//         return new Intl.NumberFormat("id-ID", {
-//             style: "currency",
-//             currency: "IDR",
-//             minimumFractionDigits: 0,
-//             maximumFractionDigits: 0,
-//         }).format(price);
-//     };
-
-//     // Truncate long names
-//     const truncateText = (text, maxLength = 30) => {
-//         if (!text) return "";
-//         return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
-//     };
-
-//     // Get status color and text
-//     const getStatusInfo = () => {
-//         if (item.is_active === undefined && item.status === undefined) return null;
-        
-//         const isActive = item.is_active === 1 || item.is_active === true || item.status === "active";
-        
-//         return {
-//             text: isActive ? "Active" : "Inactive",
-//             bgColor: isActive ? "bg-green-100" : "bg-red-100",
-//             textColor: isActive ? "text-green-800" : "text-red-800",
-//         };
-//     };
-
-//     const statusInfo = getStatusInfo();
-
-//     return (
-//         <div
-//             onClick={() => onClick?.(item)}
-//             onMouseEnter={() => setIsHovered(true)}
-//             onMouseLeave={() => setIsHovered(false)}
-//             className={`
-//                 group bg-white rounded-2xl overflow-hidden border 
-//                 w-full max-w-[320px] mx-auto text-left 
-//                 transition-all duration-300 cursor-pointer
-//                 hover:shadow-xl hover:scale-[1.02] hover:border-[#2F5231]/20
-//                 ${isHovered ? 'shadow-lg' : 'shadow-sm'}
-//             `}
-//         >
-//             {/* Image Container with overlay effect */}
-//             <div className="relative overflow-hidden bg-gray-100">
-//                 {!imageError ? (
-//                     <img
-//                         src={`${baseImageUrl}${item.image_url}`}
-//                         alt={item.name || "Menu item"}
-//                         className={`
-//                             w-full h-48 object-cover 
-//                             transition-transform duration-500 
-//                             ${isHovered ? 'scale-110' : 'scale-100'}
-//                         `}
-//                         onError={handleImageError}
-//                         loading="lazy" // Lazy load images for better performance
-//                     />
-//                 ) : (
-//                     <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
-//                         <svg 
-//                             className="w-12 h-12 text-gray-400" 
-//                             fill="none" 
-//                             stroke="currentColor" 
-//                             viewBox="0 0 24 24"
-//                         >
-//                             <path 
-//                                 strokeLinecap="round" 
-//                                 strokeLinejoin="round" 
-//                                 strokeWidth={2} 
-//                                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" 
-//                             />
-//                         </svg>
-//                     </div>
-//                 )}
-                
-//                 {/* Status Badge (if status info exists) */}
-//                 {statusInfo && (
-//                     <div className={`
-//                         absolute top-3 right-3 px-2 py-1 rounded-lg text-xs font-medium
-//                         ${statusInfo.bgColor} ${statusInfo.textColor}
-//                         backdrop-blur-sm bg-opacity-90
-//                         transition-transform duration-200
-//                         ${isHovered ? 'translate-x-0' : ''}
-//                     `}>
-//                         {statusInfo.text}
-//                     </div>
-//                 )}
-//             </div>
-
-//             {/* Content Container */}
-//             <div className="p-4 space-y-2">
-//                 <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 min-h-[3.5rem]">
-//                     {truncateText(item.name, 35)}
-//                 </h3>
-                
-//                 {/* Category (if available) */}
-//                 {item.category_name && (
-//                     <p className="text-xs text-gray-500 uppercase tracking-wide">
-//                         {item.category_name}
-//                     </p>
-//                 )}
-                
-//                 {/* Description (optional) */}
-//                 {item.description && (
-//                     <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
-//                         {truncateText(item.description, 60)}
-//                     </p>
-//                 )}
-                
-//                 {/* Price Section */}
-//                 <div className="pt-2 flex items-center justify-between border-t border-gray-100">
-//                     <div>
-//                         <p className="text-xs text-gray-500">Price</p>
-//                         <p className="text-xl font-bold text-[#2F5231]">
-//                             {formatPrice(item.base_price)}
-//                         </p>
-//                     </div>
-                    
-//                     {/* Quick action indicator */}
-//                     <div className={`
-//                         w-8 h-8 rounded-full bg-[#2F5231] text-white 
-//                         flex items-center justify-center
-//                         transition-all duration-300
-//                         ${isHovered ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2'}
-//                     `}>
-//                         <svg 
-//                             className="w-4 h-4" 
-//                             fill="none" 
-//                             stroke="currentColor" 
-//                             viewBox="0 0 24 24"
-//                         >
-//                             <path 
-//                                 strokeLinecap="round" 
-//                                 strokeLinejoin="round" 
-//                                 strokeWidth={2} 
-//                                 d="M9 5l7 7-7 7" 
-//                             />
-//                         </svg>
-//                     </div>
-//                 </div>
-//             </div>
-//         </div>
-//     );
-// }
-
-// export default MenuCard;

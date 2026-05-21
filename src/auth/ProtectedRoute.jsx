@@ -1,48 +1,34 @@
-// import { useAuth } from "../context/useAuth";
-// import { Navigate } from "react-router-dom";
-
-// function ProtectedRoute({ children }) {
-//   const { user, initialized } = useAuth();
-
-//   // tunggu auth check selesai (tanpa blank freeze lama)
-//   if (!initialized) {
-//     return (
-//       <div className="flex items-center justify-center min-h-screen">
-//         Loading...
-//       </div>
-//     );
-//   }
-
-//   return user ? children : <Navigate to="/login" replace />;
-// }
-
-// export default ProtectedRoute;
-
 import { useAuth } from "../context/useAuth";
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children, allowedRoles }) {
   const { user, initialized } = useAuth();
 
-  // ⏳ tunggu auth selesai
   if (!initialized) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        Loading...
-      </div>
+        <div className="min-h-screen flex items-center justify-center bg-[#F8F5F0]">          
+            <div className="w-10 h-10 border-4 border-[#2F5231]/20 border-t-[#2F5231] rounded-full animate-spin"/>                    
+        </div>
     );
   }
 
-  // ❌ belum login
+  // Jika belum login
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+          to="/login"
+          replace
+          state={{
+              from: location.pathname,
+          }}
+      />
+    );
   }
 
-  // 🔥 cek role (kalau dikasih)
+  // Cek role user kalo include
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/home" replace />;
   }
-
   return children;
 }
 

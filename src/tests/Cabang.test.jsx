@@ -1,10 +1,11 @@
 /// <reference types="vitest" />
 /* eslint-env vitest */
 
-import { render, screen, waitFor, fireEvent, } from "@testing-library/react";
-import Cabang from "../pages/Cabang";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import Cabang from "../pages/super_admin/Cabang";
 import API from "../services/api";
-import { vi } from "vitest";
+import { vi, beforeEach, afterEach } from "vitest";
 
 // mock auth
 vi.mock("../context/useAuth.jsx", () => ({
@@ -14,13 +15,9 @@ vi.mock("../context/useAuth.jsx", () => ({
     }),
 }));
 
-// mock layout (biar test fokus ke logic)
-vi.mock("../components/ui/SidebarAdmin.jsx", () => ({
+// mock layout
+vi.mock("../components/ui/SideBarAdmin.jsx", () => ({
     default: () => <div>Sidebar</div>,
-}));
-
-vi.mock("../components/ui/NavBarAdmin.jsx", () => ({
-    default: () => <div>Navbar</div>,
 }));
 
 // mock API
@@ -36,12 +33,9 @@ vi.mock("sweetalert2", () => ({
     },
 }));
 
-
-describe("Cabang Page (TDD)", () => {
-
+describe("Cabang Page", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-
         API.post = vi.fn();
         API.put = vi.fn();
     });
@@ -52,8 +46,12 @@ describe("Cabang Page (TDD)", () => {
 
     test("menampilkan loading saat pertama render", () => {
         API.get.mockResolvedValue({ data: { data: [] } });
-
-        render(<Cabang />);
+        
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
 
         expect(screen.getByText(/loading/i)).toBeInTheDocument();
     });
@@ -75,17 +73,18 @@ describe("Cabang Page (TDD)", () => {
             },
         });
 
-        render(<Cabang />);
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
-            expect(
-                screen.getByText("Diagram Coffee Dago")
-            ).toBeInTheDocument();
+            expect(screen.getAllByText("Diagram Coffee Dago")[0]).toBeInTheDocument();
         });
-
-        expect(screen.getByText("Jl. Dago")).toBeInTheDocument();
-        expect(screen.getByText("08123")).toBeInTheDocument();
-        expect(screen.getByText("08:00 - 22:00")).toBeInTheDocument();
+        expect(screen.getAllByText("Jl. Dago")[0]).toBeInTheDocument();
+        expect(screen.getAllByText("08123")[0]).toBeInTheDocument();
+        expect(screen.getAllByText("08:00 - 22:00")[0]).toBeInTheDocument();
     });
 
     test("menampilkan empty state jika data kosong", async () => {
@@ -93,12 +92,14 @@ describe("Cabang Page (TDD)", () => {
             data: { data: [] },
         });
 
-        render(<Cabang />);
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
-            expect(
-                screen.getByText(/data tidak ditemukan/i)
-            ).toBeInTheDocument();
+            expect(screen.getByText(/data tidak ditemukan/i)).toBeInTheDocument();
         });
     });
 
@@ -128,23 +129,25 @@ describe("Cabang Page (TDD)", () => {
             },
         });
 
-        render(<Cabang />);
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
-            expect(screen.getByText("Dago")).toBeInTheDocument();
+            expect(screen.getAllByText("Dago")[0]).toBeInTheDocument();
         });
 
-        const input = screen.getByPlaceholderText(/search/i);
-
+        const input = screen.getByPlaceholderText(/cari cabang/i);
         fireEvent.change(input, { target: { value: "bandung" } });
 
         await waitFor(() => {
-            expect(screen.getByText("Bandung")).toBeInTheDocument();
+            expect(screen.getAllByText("Bandung")[0]).toBeInTheDocument();
         });
     });
 
     test("membuka modal edit dengan data terisi", async () => {
-
         API.get.mockResolvedValue({
             data: {
                 data: [
@@ -161,24 +164,22 @@ describe("Cabang Page (TDD)", () => {
             },
         });
 
-        render(<Cabang />);
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
 
         await waitFor(() => {
-            expect(screen.getByText("Dago"))
-                .toBeInTheDocument();
+            expect(screen.getAllByText("Dago")[0]).toBeInTheDocument();
         });
 
         fireEvent.click(
             screen.getByText(/edit/i)
         );
 
-        expect(
-            screen.getByDisplayValue("Dago")
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByDisplayValue("Jl. Dago")
-        ).toBeInTheDocument();
+        expect(screen.getByDisplayValue("Dago")).toBeInTheDocument();
+        expect(screen.getByDisplayValue("Jl. Dago")).toBeInTheDocument();
     });
 
     test("membuka modal tambah cabang", async () => {
@@ -187,19 +188,17 @@ describe("Cabang Page (TDD)", () => {
             data: { data: [] },
         });
 
-        render(<Cabang />);
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
 
         fireEvent.click(
             screen.getByText(/tambah cabang/i)
         );
 
-        expect(
-            screen.getByRole("heading")
-        ).toHaveTextContent("Tambah Cabang");
-
-        expect(
-            screen.getByPlaceholderText("Nama")
-        ).toBeInTheDocument();
+        screen.getByRole("heading", { name: /tambah cabang/i });
+        expect(screen.getByPlaceholderText(/masukkan nama cabang/i)).toBeInTheDocument();
     });
-
 });

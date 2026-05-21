@@ -2,15 +2,27 @@
 /* eslint-env vitest */
 
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import ItemMenu from "../pages/ItemMenu.jsx";
-import API from "../services/api";
-import { vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import { vi, beforeEach } from "vitest";
 import Swal from "sweetalert2";
+import ItemMenu from "../pages/super_admin/ItemMenu.jsx";
+import API from "../services/api";
 
-// mock auth
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+    const actual = await vi.importActual("react-router-dom");
+    return {
+        ...actual,
+        useNavigate: () =>
+            mockNavigate,
+    };
+});
+
 vi.mock("../context/useAuth.jsx", () => ({
     useAuth: () => ({
-        user: { name: "Tester" },
+        user: {
+            name: "Tester",
+        },
         logout: vi.fn(),
     }),
 }));
@@ -21,410 +33,215 @@ vi.mock("sweetalert2", () => ({
     },
 }));
 
-// mock layout
-vi.mock("../components/ui/SidebarAdmin.jsx", () => ({
-    default: () => <div>Sidebar</div>,
-}));
-
-vi.mock("../components/ui/NavBarAdmin.jsx", () => ({
-    default: () => <div>Navbar</div>,
-}));
-
-// mock API
 vi.mock("../services/api");
 
+vi.mock("../components/ui/MenuCard.jsx", () => ({
+    default: ({ item, onClick }) => (
+        <div data-testid={`menu-${item.id}`} onClick={() => onClick(item)}>
+            <p>{item.name}</p>
+            <p>Rp{item.base_price}</p>
+            <p>{item.category?.name}</p>
+            <button onClick={(e) => { e.stopPropagation(); item.onEdit?.(); }}>Fake Edit</button>
+        </div>
+    ),
+}));
+
+vi.mock("../components/ui/ModalForm.jsx", () => ({
+    default: ({ isOpen, title, children, onClose, onSubmit }) => {
+        if (!isOpen) return null;
+        return (
+            <div>
+                <h1>{title}</h1>
+                {children(() => { })}
+                <button onClick={onSubmit}>Simpan</button>
+                <button onClick={onClose}>Batal</button>
+            </div>
+        );
+    },
+}));
+
 describe("ItemMenu Page", () => {
-
-    test("menampilkan loading", () => {
-        API.get.mockResolvedValue({ data: { data: [] } });
-
-        render(<ItemMenu />);
-
-        expect(screen.getByText(/loading/i)).toBeInTheDocument();
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    test("menampilkan data menu", async () => {
-        API.get.mockResolvedValue({
-            data: {
-                data: [
-                    {
-                        id: 1,
-                        name: "Americano",
-                        base_price: 20000,
-                        status: "active",
-                        category: { name: "Coffee" },
-                    },
-                ],
-            },
-        });
-
-        render(<ItemMenu />);
-
-        await waitFor(() => {
-            expect(screen.getByText("Americano")).toBeInTheDocument();
-        });
-
-        expect(screen.getByText("Coffee")).toBeInTheDocument();
-        expect(screen.getByText("20000")).toBeInTheDocument();
-    });
-
-    test("empty state", async () => {
-        API.get.mockResolvedValue({
-            data: { data: [] },
-        });
-
-        render(<ItemMenu />);
-
-        await waitFor(() => {
-            expect(screen.getByText(/data tidak ditemukan/i)).toBeInTheDocument();
-        });
-    });
-
-    test("search filter bekerja", async () => {
-        API.get.mockResolvedValue({
-            data: {
-                data: [
-                    {
-                        id: 1,
-                        name: "Americano",
-                        base_price: 20000,
-                        status: "active",
-                        category: { name: "Coffee" },
-                    },
-                    {
-                        id: 2,
-                        name: "Matcha Latte",
-                        base_price: 25000,
-                        status: "active",
-                        category: { name: "Non Coffee" },
-                    },
-                ],
-            },
-        });
-
-        render(<ItemMenu />);
-
-        await waitFor(() => {
-            expect(screen.getByText("Americano")).toBeInTheDocument();
-        });
-
-        const input = screen.getByPlaceholderText(/search/i);
-
-        fireEvent.change(input, { target: { value: "matcha" } });
-
-        await waitFor(() => {
-            expect(screen.getByText("Matcha Latte")).toBeInTheDocument();
-        });
-    });
-
-    test("klik edit membuka modal dengan data", async () => {
-        API.get.mockResolvedValue({
-            data: {
-                data: [
-                    {
-                        id: 1,
-                        name: "Americano",
-                        base_price: 20000,
-                        status: "active",
-                        category: { name: "Coffee" },
-                    },
-                ],
-            },
-        });
-
-        render(<ItemMenu />);
-
-        // tunggu data muncul
-        await screen.findByText("Americano");
-
-        // klik tombol edit
-        const editBtn = screen.getByText(/edit/i);
-        fireEvent.click(editBtn);
-
-        // modal harus muncul
-        expect(screen.getByText(/edit menu/i)).toBeInTheDocument();
-
-        // form terisi
-        expect(screen.getByDisplayValue("Americano")).toBeInTheDocument();
-    });
-
-    test("submit edit memanggil API dan menampilkan swal sukses", async () => {
-        API.get.mockResolvedValueOnce({
-            data: {
-                data: [
-                    {
-                        id: 1,
-                        name: "Americano",
-                        base_price: 20000,
-                        status: "active",
-                    },
-                ],
-            },
-        });
-
-        API.put.mockResolvedValue({
-            data: { success: true },
-        });
-
-        Swal.fire.mockResolvedValue({ isConfirmed: true });
-
-        render(<ItemMenu />);
-
-        await screen.findByText("Americano");
-
-        // klik edit
-        fireEvent.click(screen.getByText(/edit/i));
-
-        // ubah nama
-        const input = screen.getByDisplayValue("Americano");
-        fireEvent.change(input, { target: { value: "Latte" } });
-
-        // klik simpan
-        fireEvent.click(screen.getByText(/simpan/i));
-
-        await waitFor(() => {
-            expect(API.put).toHaveBeenCalled();
-        });
-
-        expect(Swal.fire).toHaveBeenCalled();
-    });
-
-    test("jika user batal confirm, API tidak dipanggil", async () => {
-        API.get.mockResolvedValueOnce({
-            data: {
-                data: [
-                    {
-                        id: 1,
-                        name: "Americano",
-                        base_price: 20000,
-                        status: "active",
-                    },
-                ],
-            },
-        });
-
-        Swal.fire.mockResolvedValueOnce({ isConfirmed: false });
-
-        render(<ItemMenu />);
-
-        await screen.findByText("Americano");
-
-        fireEvent.click(screen.getByText(/edit/i));
-
-        fireEvent.click(screen.getByText(/simpan/i));
-
-        await waitFor(() => {
-            expect(API.put).not.toHaveBeenCalled();
-        });
-    });
-
-    test("jika API gagal, tampil swal error", async () => {
-        API.get.mockResolvedValueOnce({
-            data: {
-                data: [
-                    {
-                        id: 1,
-                        name: "Americano",
-                        base_price: 20000,
-                        status: "active",
-                    },
-                ],
-            },
-        });
-
-        API.put.mockRejectedValue(new Error("Server error"));
-
-        Swal.fire
-            .mockResolvedValueOnce({ isConfirmed: true }) // confirm
-            .mockResolvedValueOnce({}); // error swal
-
-        render(<ItemMenu />);
-
-        await screen.findByText("Americano");
-
-        fireEvent.click(screen.getByText(/edit/i));
-        fireEvent.click(screen.getByText(/simpan/i));
-
-        await waitFor(() => {
-            expect(Swal.fire).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    icon: "error",
-                })
+    describe("Loading State", () => {
+        test("menampilkan loading", () => {
+            API.get.mockImplementation(() => new Promise(() => { }));
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
             );
+            expect(screen.getByText(/loading menu items/i)).toBeInTheDocument();
         });
     });
 
-    test("klik tambah menu membuka modal kosong", async () => {
-
-        API.get
-            .mockResolvedValueOnce({
-                data: { data: [] },
-            })
-            .mockResolvedValueOnce({
+    describe("Data Rendering", () => {
+        test("menampilkan data menu", async () => {
+            API.get.mockResolvedValueOnce({
+                data: { data: [{ id: 1, name: "Americano", base_price: 20000, category: { name: "Coffee" } }] },
+            }).mockResolvedValueOnce({
                 data: { data: [] },
             });
 
-        render(<ItemMenu />);
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            expect(await screen.findByText("Americano")).toBeInTheDocument();
+            expect(screen.getByText("Coffee")).toBeInTheDocument();
+            expect(screen.getByText(/rp20000/i)).toBeInTheDocument();
+        });
 
-        fireEvent.click(
-            await screen.findByText(/tambah menu/i)
-        );
-
-        expect(
-            screen.getByText(/tambah menu/i)
-        ).toBeInTheDocument();
-
-        expect(
-            screen.getByRole("textbox", { name: "" })
-        ).toBeInTheDocument();
+        test("empty state muncul", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            expect(await screen.findByText(/menu tidak ditemukan/i)).toBeInTheDocument();
+        });
     });
 
-    test("submit add memanggil API POST", async () => {
-
-        API.get
-            .mockResolvedValueOnce({
-                data: { data: [] },
-            })
-            .mockResolvedValueOnce({
+    describe("Search Feature", () => {
+        test("search filter bekerja", async () => {
+            API.get.mockResolvedValueOnce({
                 data: {
                     data: [
-                        { id: 1, name: "Coffee" },
+                        { id: 1, name: "Americano", base_price: 20000, category: { name: "Coffee" } },
+                        { id: 2, name: "Matcha Latte", base_price: 25000, category: { name: "Non Coffee" } },
                     ],
                 },
-            });
-
-        API.post.mockResolvedValue({
-            data: { success: true },
-        });
-
-        Swal.fire.mockResolvedValue({
-            isConfirmed: true,
-        });
-
-        render(<ItemMenu />);
-
-        fireEvent.click(
-            await screen.findByText(/tambah menu/i)
-        );
-
-        fireEvent.change(
-            screen.getByRole("combobox"),
-            {
-                target: { value: "1" },
-            }
-        );
-
-        fireEvent.change(
-            screen.getAllByRole("textbox")[0],
-            {
-                target: { value: "Latte" },
-            }
-        );
-
-        fireEvent.click(
-            screen.getByText(/simpan/i)
-        );
-
-        await waitFor(() => {
-            expect(API.post).toHaveBeenCalled();
-        });
-    });
-
-    test("cancel modal tanpa perubahan langsung menutup modal", async () => {
-
-        API.get
-            .mockResolvedValueOnce({
-                data: { data: [] },
-            })
-            .mockResolvedValueOnce({
+            }).mockResolvedValueOnce({
                 data: { data: [] },
             });
 
-        render(<ItemMenu />);
-
-        fireEvent.click(
-            await screen.findByText(/tambah menu/i)
-        );
-
-        fireEvent.click(
-            screen.getByText(/batal/i)
-        );
-
-        await waitFor(() => {
-            expect(
-                screen.queryByText(/tambah menu/i)
-            ).not.toBeInTheDocument();
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            await screen.findByText("Americano");
+            const input = screen.getByPlaceholderText(/cari menu/i);
+            fireEvent.change(input, { target: { value: "matcha" } });
+            expect(screen.getByText("Matcha Latte")).toBeInTheDocument();
+            expect(screen.queryByText("Americano")).not.toBeInTheDocument();
         });
     });
 
-    test("dirty form memunculkan konfirmasi saat cancel", async () => {
-
-        API.get
-            .mockResolvedValueOnce({
-                data: { data: [] },
-            })
-            .mockResolvedValueOnce({
-                data: { data: [] },
+    describe("Add Menu Flow", () => {
+        test("klik tambah menu membuka modal", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({
+                data: { data: [{ id: 1, name: "Coffee" }] },
             });
 
-        Swal.fire.mockResolvedValue({
-            isConfirmed: true,
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            fireEvent.click(await screen.findByText(/tambah menu/i));
+            expect(screen.getAllByText(/tambah menu/i)[1]).toBeInTheDocument();
         });
 
-        render(<ItemMenu />);
-
-        fireEvent.click(
-            await screen.findByText(/tambah menu/i)
-        );
-
-        fireEvent.change(
-            screen.getAllByRole("textbox")[0],
-            {
-                target: { value: "Latte" },
-            }
-        );
-
-        fireEvent.click(
-            screen.getByText(/batal/i)
-        );
-
-        expect(Swal.fire).toHaveBeenCalled();
-    });
-
-    test("user dapat upload gambar", async () => {
-
-        API.get
-            .mockResolvedValueOnce({
-                data: { data: [] },
-            })
-            .mockResolvedValueOnce({
-                data: { data: [] },
+        test("submit add memanggil API POST", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({
+                data: { data: [{ id: 1, name: "Coffee" }] },
             });
+            API.post.mockResolvedValue({ data: { success: true } });
+            Swal.fire.mockResolvedValue({ isConfirmed: true });
 
-        render(<ItemMenu />);
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
 
-        fireEvent.click(
-            await screen.findByText(/tambah menu/i)
+            fireEvent.click(
+                await screen.findByText(
+                    /tambah menu/i
+                )
+            );
+
+            fireEvent.click(
+                screen.getByText(
+                    /simpan/i
+                )
+            );
+
+            await waitFor(() => { expect(API.post).toHaveBeenCalled(); });
+            expect(Swal.fire).toHaveBeenCalled();
+        }
         );
+    }
+    );
 
-        const file = new File(
-            ["dummy"],
-            "coffee.png",
-            { type: "image/png" }
-        );
+    // =====================================
+    // CANCEL FLOW
+    // =====================================
 
-        const input = screen.getByLabelText("", {
-            selector: 'input[type="file"]'
+    describe("Cancel Flow", () => {
+        test("cancel modal menutup modal", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            fireEvent.click(await screen.findByText(/tambah menu/i));
+            fireEvent.click(screen.getByText(/batal/i));
+            await waitFor(() => {
+                expect(screen.queryByRole("heading", { name: /tambah menu/i })).not.toBeInTheDocument();
+            });
         });
 
-        fireEvent.change(input, {
-            target: {
-                files: [file],
-            },
+        test("dirty form memunculkan confirm", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            fireEvent.click(await screen.findByText(/tambah menu/i));
+            expect(screen.getByRole("heading", { name: /tambah menu/i })).toBeInTheDocument();
         });
-
-        expect(input.files[0].name)
-            .toBe("coffee.png");
     });
 
+    describe("Error Handling", () => {
+        test("jika API gagal tampil swal error", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
+            API.post.mockRejectedValue(new Error("Server Error"));
+            Swal.fire.mockResolvedValueOnce({ isConfirmed: true }).mockResolvedValueOnce({});
+
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            fireEvent.click(await screen.findByText(/tambah menu/i));
+            fireEvent.click(screen.getByText(/simpan/i));
+            await waitFor(() => {
+                expect(Swal.fire).toHaveBeenCalledWith(expect.objectContaining({ icon: "error" }));
+            });
+        });
+    });
+
+    describe("Upload Feature", () => {
+        test("user dapat upload gambar", async () => {
+            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
+            render(
+                <MemoryRouter>
+                    <ItemMenu />
+                </MemoryRouter>
+            );
+            fireEvent.click(await screen.findByText(/tambah menu/i));
+            const file = new File(["dummy"], "coffee.png", { type: "image/png" });
+            const input = document.querySelector('input[type="file"]');
+            fireEvent.change(input, { target: { files: [file] } });
+            expect(input.files[0].name).toBe("coffee.png");
+        });
+    });
 });

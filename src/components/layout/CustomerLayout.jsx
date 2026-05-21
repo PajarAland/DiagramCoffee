@@ -1,22 +1,28 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation, } from "react-router-dom";
+import { useEffect } from "react";
 import TitleBar from "../ui/TitleBar.jsx";
-import Home from "../../pages/Home.jsx";
-import ItemCart from "../ui/ItemCart.jsx";
+import SidebarUser from "../ui/SidebarCustomer.jsx";
 
 function CustomerLayout() {
+    const location = useLocation();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [location.pathname]);
+
     return (
-        <div className="min-h-screen bg-[#F7F3Ef] pb-5">
+        <div className="min-h-screen bg-[#F7F3EF]">
+            <SidebarUser />
 
-            {/* TITLEBAR */}
-            <TitleBar/>
+            {/* CONTENT AREA */}
+            <div className="lg:ml-64 min-h-screen flex flex-col">
+                <TitleBar />
 
-            {/* <ItemCart /> */}
-
-            {/* PAGE CONTENT */}
-            <main>
-                <Outlet />
-            </main>
-
+                {/* PAGE CONTENT */}
+                <main className="flex-1 pb-24 lg:pb-0">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 }

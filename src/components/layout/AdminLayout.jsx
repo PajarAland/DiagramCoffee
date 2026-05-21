@@ -1,19 +1,18 @@
-// components/layout/SuperAdminLayout.jsx
-import { Outlet } from "react-router-dom"; // Import Outlet
+import { Outlet } from "react-router-dom";
 import SidebarAdmin from "../ui/SideBarAdmin.jsx";
-import { useAuth } from "../../context/useAuth"; // Import useAuth
+import { useAuth } from "../../context/useAuth";
 
 function AdminLayout() {
-    const { logout } = useAuth(); // Get logout from context instead of props
+    const { logout } = useAuth();
     
     return (
         <div className="min-h-screen bg-[#F5F1E5]">
             <SidebarAdmin logout={logout} />
             
-            {/* Main content area with responsive margin */}
-            <main className="lg:ml-64 p-4 md:p-6 lg:p-8">
+            {/* MAIN CONTENT*/}
+            <main className="lg:ml-64 p-4 md:p-6 lg:p-8 transition-all duration-300">
                 <div className="max-w-7xl mx-auto">
-                    <Outlet /> {/* This will render the child routes */}
+                    <Outlet />
                 </div>
             </main>
         </div>

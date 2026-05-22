@@ -1,12 +1,10 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import SidebarAdmin from "../ui/SideBarAdmin.jsx";
 import { useAuth } from "../../context/useAuth";
-import TitleBar from "../ui/TitleBar.jsx";
 import { useState, useEffect } from "react";
 
 function SuperAdminLayout() {
     const { logout } = useAuth();
-    const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
@@ -28,23 +26,12 @@ function SuperAdminLayout() {
         }
     };
 
-    const getPageTitle = () => {
-        const path = location.pathname.split('/').pop();
-        const titles = {
-            dashboard: 'Dashboard',
-            categories: 'Categories',
-            cabang: 'Branches',
-            'item-menu': 'Menu Items'
-        };
-        return titles[path] || 'Dashboard';
-    };
-
     return (
         <div className="min-h-screen bg-[#F5F1E5]">
             {isMobile && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed top-4 left-4 z-50 p-2 bg-[#2F5231] text-white rounded-lg shadow-lg hover:bg-[#1e3820] transition-all active:scale-95"
+                    className="fixed top-0 z-30 m-3 p-1 bg-[#2F5231] text-white rounded-lg shadow-lg hover:bg-[#1e3820] transition-all active:scale-95"
                     aria-label="Toggle menu"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -61,9 +48,49 @@ function SuperAdminLayout() {
                 />
             )}
 
+            {isMobile && (
+                <button
+                    onClick={toggleSidebar}
+                    className="
+                        absolute
+                        top-4
+                        right-4
+                        z-50
+                        w-9
+                        h-9
+                        rounded-lg
+                        bg-white/10
+                        hover:bg-white/20
+                        text-white
+                        flex
+                        items-center
+                        justify-center
+                        transition-all
+                    "
+                >
+
+                    <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+
+                    </svg>
+
+                </button>
+            )}
+
             {/* Sidebar */}
             <aside className={`
-                fixed top-0 left-0 h-full z-40 transition-transform duration-300 ease-in-out
+                fixed top-0 left-0 h-full z-50 transition-transform duration-300 ease-in-out
                 ${isMobile
                     ? `${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} w-64`
                     : 'translate-x-0 w-64 lg:w-72'
@@ -77,19 +104,6 @@ function SuperAdminLayout() {
                 transition-all duration-300 min-h-screen flex flex-col
                 ${isMobile ? 'w-full' : 'lg:ml-64'}
             `}>
-                <TitleBar
-                    title={getPageTitle()}
-                    action={
-                        <div className="flex items-center gap-2 md:gap-3">
-                            <button className="p-1.5 md:p-2 hover:bg-white/50 rounded-full transition-colors relative">
-                                <svg className="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                </svg>
-                                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-                        </div>
-                    }
-                />
 
                 {/* Content Area */}
                 <div className="flex-1 p-4 md:p-6 lg:p-8">

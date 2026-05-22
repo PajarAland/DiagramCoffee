@@ -140,6 +140,27 @@ describe("Kasir Page", () => {
         expect(await screen.findByText("Payment Status")).toBeInTheDocument();
     });
 
+    test("cancel order memanggil endpoint", async () => {
+        API.post.mockResolvedValue({
+            data: {success: true}     
+        });
+        const Swal = (await import("sweetalert2")).default;
+        Swal.fire.mockResolvedValueOnce({isConfirmed: true});
+            
+        render(
+            <Kasir />
+        );
+
+        const order = await screen.findByText("ORD-001");
+        fireEvent.click(order);
+        const cancelButton = await screen.findByText("Cancel Order");           
+        fireEvent.click(cancelButton);
+    
+        await waitFor(() => {
+            expect(API.post).toHaveBeenCalledWith("/api/orders/1/cancel");          
+        });
+    });
+
     test("confirm cash memanggil endpoint", async () => {
         API.post.mockResolvedValue({ data: { success: true } });
         render(

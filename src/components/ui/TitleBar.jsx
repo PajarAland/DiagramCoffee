@@ -6,8 +6,8 @@ import { useAuth } from "../../context/useAuth";
 
 function TitleBar() {
     const { user } = useAuth();
-    const [showCart, setShowCart] = useState(false);
-
+    const [setShowCart] = useState(false);
+    const showCart = !user || (user.role !== "admin" && user.role !== "super_admin");
     const showCabangSelector = !user || (user.role !== "admin" && user.role !== "super_admin");
 
     return (
@@ -24,24 +24,25 @@ function TitleBar() {
                     {showCabangSelector && <CabangSelector />}
                 </div>
 
-                <button
-                    onClick={() => setShowCart(true)}
-                    className="
-                        w-11 h-11 md:w-14 md:h-14
-                        rounded-xl md:rounded-2xl
-                        bg-[#2F5D34]
-                        flex items-center justify-center
-                        relative
-                    "
-                >
+                {showCart && (
+                    <button
+                        onClick={() => setShowCart(true)}
+                        className="
+                            w-11 h-11 md:w-14 md:h-14
+                            rounded-xl md:rounded-2xl
+                            bg-[#2F5D34]
+                            flex items-center justify-center
+                            relative
+                        "
+                    >
 
-                    <img
-                        src={cartIcon}
-                        alt="cart"
-                        className="w-6 h-6 md:w-7 md:h-7"
-                    />
-                </button>
-
+                        <img
+                            src={cartIcon}
+                            alt="cart"
+                            className="w-6 h-6 md:w-7 md:h-7"
+                        />
+                    </button>
+                )}
             </header>
 
             {showCart && (

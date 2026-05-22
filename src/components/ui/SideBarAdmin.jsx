@@ -75,7 +75,7 @@ function NavItems() {
         },
         {
             label: "Manage Order",
-            path: "/admin/orders",
+            path: "/admin/order-hub",
             iconWhite: receiptIconWhite,
             iconGold: receiptIconGold,
         },

@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import API from "../../services/api";
+import cardClockIcon from "../../assets/mdi--credit-card-clock-outline.svg"; 
+import coffeeMakerIcon from "../../assets/mdi--coffee-maker-check.svg"; 
+import checkMarkIcon from "../../assets/mdi--check-circle.svg"; 
+import finishFlagIcon from "../../assets/mdi--flag-checkered.svg"; 
+import bellIcon from "../../assets/mdi--bell-alert.svg"; 
+import cancelIcon from "../../assets/mdi--cancel-circle.svg";
 
 function OrderStatus() {
     const navigate = useNavigate();
@@ -29,15 +35,13 @@ function OrderStatus() {
         fetchOrder();
     }, [orderNumber]);
 
-    
-
     const getStatusConfig = () => {
         if (!order) return {};
 
         switch (order.status) {
             case "pending":
                 return {
-                    emoji: "⏳",
+                    icon: cardClockIcon,
                     title: "Menunggu Pembayaran",
                     description: "Selesaikan pembayaran untuk memproses pesanan Anda",
                     color: "text-yellow-700",
@@ -48,7 +52,7 @@ function OrderStatus() {
                 };
             case "confirmed":
                 return {
-                    emoji: "✅",
+                    icon: checkMarkIcon,
                     title: "Pembayaran Dikonfirmasi",
                     description: "Pesanan Anda telah kami terima dan akan segera diproses",
                     color: "text-blue-700",
@@ -59,7 +63,7 @@ function OrderStatus() {
                 };
             case "preparing":
                 return {
-                    emoji: "☕",
+                    icon: coffeeMakerIcon,
                     title: "Sedang Disiapkan",
                     description: "Barista kami sedang menyiapkan pesanan spesial untuk Anda",
                     color: "text-indigo-700",
@@ -70,7 +74,7 @@ function OrderStatus() {
                 };
             case "ready":
                 return {
-                    emoji: "🛎️",
+                    icon: bellIcon,
                     title: "Pesanan Siap Diambil",
                     description: "Pesanan Anda sudah siap, silakan ambil di kasir",
                     color: "text-green-700",
@@ -81,7 +85,7 @@ function OrderStatus() {
                 };
             case "completed":
                 return {
-                    emoji: "🎉",
+                    icon: finishFlagIcon,
                     title: "Pesanan Selesai",
                     description: "Terima kasih! Selamat menikmati pesanan Anda",
                     color: "text-gray-700",
@@ -92,7 +96,7 @@ function OrderStatus() {
                 };
             case "cancelled":
                 return {
-                    emoji: "❌",
+                    icon: cancelIcon,
                     title: "Pesanan Dibatalkan",
                     description: "Pesanan Anda telah dibatalkan",
                     color: "text-red-700",
@@ -119,11 +123,11 @@ function OrderStatus() {
 
     const getProgressSteps = () => {
         const steps = [
-            { label: "Menunggu", icon: "⏳", status: "pending" },
-            { label: "Dikonfirmasi", icon: "✅", status: "confirmed" },
-            { label: "Disiapkan", icon: "☕", status: "preparing" },
-            { label: "Siap", icon: "🛎️", status: "ready" },
-            { label: "Selesai", icon: "🎉", status: "completed" },
+            { label: "Menunggu", icon: cardClockIcon, status: "pending" },
+            { label: "Dikonfirmasi", icon: checkMarkIcon, status: "confirmed" },
+            { label: "Disiapkan", icon: coffeeMakerIcon, status: "preparing" },
+            { label: "Siap", icon: bellIcon, status: "ready" },
+            { label: "Selesai", icon: finishFlagIcon, status: "completed" },
         ];
 
         const currentStep = statusConfig.step;
@@ -182,6 +186,16 @@ function OrderStatus() {
 
     const progressSteps = getProgressSteps();
 
+    const handleCancelOrder = async () => {
+        try {
+            await API.post(`/api/orders/${order.id}/cancel`);
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert(err?.response?.data?.message || "Gagal membatalkan pesanan");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-[#F7F3EF] py-8 px-4">
             <div className="max-w-4xl mx-auto">
@@ -193,7 +207,7 @@ function OrderStatus() {
                         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
                         
                         <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${statusConfig.iconBg} shadow-lg mb-4 transform transition-all duration-300 hover:scale-110`}>
-                            <div className="text-5xl">{statusConfig.emoji}</div>
+                            <img src={statusConfig.icon} alt="status icon" className="w-10 h-10 object-contain"/>
                         </div>
                         
                         <h1 className={`text-4xl font-bold ${statusConfig.color} mb-2`}>
@@ -205,7 +219,7 @@ function OrderStatus() {
                         </p>
 
                         {redirectStatus === "success" && (
-                            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full text-xs font-semibold shadow-md animate-pulse">
+                            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full text-xs font-semibold shadow-md">
                                 <span>✓</span>
                                 Pembayaran berhasil diverifikasi
                             </div>
@@ -227,7 +241,7 @@ function OrderStatus() {
                                                       step.isCurrent ? 'bg-[#2F5231] text-white shadow-lg ring-4 ring-[#2F5231] ring-opacity-30' : 
                                                       'bg-gray-200 text-gray-400'}
                                                 `}>
-                                                    {step.isCompleted ? '✓' : step.icon}
+                                                    {step.isCompleted ? ("✓") : (<img src={step.icon} alt={step.label} className="w-5 h-5 object-contain"/>)}
                                                 </div>
                                                 <p className="text-xs font-medium mt-2 text-gray-600 hidden sm:block">
                                                     {step.label}
@@ -354,13 +368,62 @@ function OrderStatus() {
                         )}
 
                         {/* ACTION BUTTON */}
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 flex-wrap">
                             <button
                                 onClick={() => navigate("/home")}
-                                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#2F5231] to-[#1e3a20] text-white text-sm font-semibold shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105"
+                                className="px-6 py-3 items-center rounded-xl bg-gradient-to-r from-[#2F5231] to-[#1e3a20] text-white text-sm font-semibold shadow-md hover:shadow-lg transform transition-all duration-200 hover:scale-105"
                             >
                                 Kembali ke Home
                             </button>
+
+                            {order.payment_status === "unpaid" &&
+                                order.xendit_invoice_url && (
+
+                                <button
+                                    onClick={() =>
+                                        window.open(
+                                            order.xendit_invoice_url,
+                                            "_blank"
+                                        )
+                                    }
+                                    className="
+                                        flex-1
+                                        py-3
+                                        rounded-xl
+                                        bg-yellow-500
+                                        hover:bg-yellow-600
+                                        text-white
+                                        text-sm
+                                        font-semibold
+                                        shadow-md
+                                        transition-all
+                                        duration-200
+                                    "
+                                >
+                                    Lanjutkan Pembayaran
+                                </button>
+                            )}
+
+                            {order.status === "pending" && (
+                                <button
+                                    onClick={handleCancelOrder}
+                                    className="
+                                        px-6
+                                        py-3
+                                        rounded-xl
+                                        bg-red-500
+                                        hover:bg-red-600
+                                        text-white
+                                        text-sm
+                                        font-semibold
+                                        shadow-md
+                                        transition-all
+                                        duration-200
+                                    "
+                                >
+                                    Batalkan Pesanan
+                                </button>
+                            )}
                             
                             {order.status === "ready" && (
                                 <button

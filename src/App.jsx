@@ -90,7 +90,7 @@ const BranchStock = lazy(() =>
   import("./pages/admin/BranchStock")
 );
 
-const Kasir = lazy(() =>
+const OrderHub = lazy(() =>
   import("./pages/admin/OrderHub")
 );
 
@@ -361,8 +361,8 @@ function App() {
                 />
 
                 <Route
-                  path="orders"
-                  element={<Kasir />}
+                  path="order-hub"
+                  element={<OrderHub />}
                 />
 
                 <Route

@@ -106,10 +106,9 @@ function OrderHub() {
     );
 
     // COMPLETED
-    const completedOrders = filteredOrders.filter((order) =>
-        ["completed", "cancelled"].includes(order.status)
-    );
-
+    const completedOrders = filteredOrders.filter((order) =>         
+        ["completed", "cancelled"].includes(order.status)).slice(0, 10);             
+        
     const handleConfirmCash = async (order) => {
         try {
             await API.post(`/api/admin/orders/${order.id}/confirm-cash`);
@@ -127,6 +126,39 @@ function OrderHub() {
                 icon: "error",
                 title: "Gagal",
                 text: err?.response?.data?.message || "Gagal konfirmasi cash",
+            });
+        }
+    };
+
+    const handleCancelOrder = async () => {
+        if (!selectedOrder) return;
+        const result =
+            await Swal.fire({
+                title: "Batalkan pesanan?",
+                text: "Pesanan akan dibatalkan permanen",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Batalkan",
+                cancelButtonText: "Tidak",                  
+            });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            await API.post(`/api/orders/${selectedOrder.id}/cancel`);
+            Swal.fire({
+                icon: "success",       
+                title: "Pesanan dibatalkan",
+                timer: 1200,                 
+                showConfirmButton: false,    
+            });
+            await fetchOrders();
+        } catch (err) {
+            console.error(err);
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text: err?.response?.data?.message || "Gagal cancel order", 
             });
         }
     };
@@ -168,6 +200,23 @@ function OrderHub() {
     const renderActionButton = () => {
         if (!selectedOrder) return null;
         switch (selectedOrder.status) {
+            case "pending":
+                return (
+                    <button
+                        onClick={handleCancelOrder}
+                        className="
+                            px-4
+                            py-2
+                            rounded-lg
+                            bg-red-500
+                            text-white
+                            text-sm
+                            font-medium
+                        "
+                    >
+                        Cancel Order
+                    </button>
+                );
             case "confirmed":
                 return (
                     <button

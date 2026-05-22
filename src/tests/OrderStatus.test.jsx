@@ -26,6 +26,7 @@ vi.mock(
 vi.mock("../services/api", () => ({
     default: {
         get: vi.fn(),
+        post: vi.fn(),
     },
 }));
 
@@ -162,7 +163,85 @@ describe("OrderStatus Page", () => {
         expect(screen.getByText(/jangan terlalu manis/i)).toBeInTheDocument();
     });
 
+    test("lanjutkan pembayaran membuka xendit invoice", async () => {
+        window.open = vi.fn();
+        API.get.mockResolvedValueOnce({
+            data: {
+                data: {
+                    id: 1,
+                    order_number: "ORD-001",
+                    status: "pending",
+                    payment_method: "xendit",
+                    payment_status: "unpaid",
+                    xendit_invoice_url:
+                        "https://xendit.co/invoice/123",
+                    total_amount: 18000,
+                    created_at:
+                        "2026-05-21T10:00:00.000000Z",
+                    branch: {
+                        name: "Cabang Bandung"
+                    },
+                    items: [],
+                },
+            },
+        });
+        renderPage();
+        const payButton = await screen.findByText(/lanjutkan pembayaran/i);
+        fireEvent.click(payButton);
+
+        expect(window.open)
+            .toHaveBeenCalledWith(
+                "https://xendit.co/invoice/123",
+                "_blank"
+            );
+    });
+
+    test("cancel order memanggil endpoint cancel", async () => {
+
+        API.get.mockResolvedValueOnce({
+            data: {
+                data: {
+                    id: 1,
+                    order_number: "ORD-001",
+                    status: "pending",
+                    payment_method: "cash",
+                    payment_status: "unpaid",
+                    total_amount: 18000,
+                    created_at:
+                        "2026-05-21T10:00:00.000000Z",
+                    branch: {
+                        name: "Cabang Bandung"
+                    },
+                    items: [],
+                },
+            },
+        });
+
+        API.post.mockResolvedValueOnce({
+            data: {
+                success: true,
+            },
+        });
+
+        renderPage();
+
+        const cancelButton =
+            await screen.findByText(
+                /batalkan pesanan/i
+            );
+
+        fireEvent.click(
+            cancelButton
+        );
+
+        expect(API.post)
+            .toHaveBeenCalledWith(
+                "/api/orders/1/cancel"
+            );
+    });
+
     test("shows error state when API fails", async () => {
+        API.get.mockReset();
         API.get.mockRejectedValueOnce({
             response: {
                 data: {

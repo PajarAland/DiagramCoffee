@@ -75,14 +75,12 @@ function Dashboard() {
     return (
         <div className="min-h-screen p-6">
             <div className="max-w-7xl mx-auto">
-                {/* HEADER */}
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-4xl font-bold text-gray-800">Dashboard</h1>
-                        <p className="text-gray-500 mt-2">Statistik penjualan Diagram Coffee ☕</p>
+                        <p className="text-gray-500 mt-2">Statistik penjualan Diagram Coffee</p>
                     </div>
 
-                    {/* FILTERS */}
                     <div className="flex gap-3 flex-wrap">
                         <select
                             value={days}
@@ -111,9 +109,7 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* KPI */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
-                    {/* TRANSACTIONS */}
                     <div className="bg-white rounded-3xl p-6 shadow-lg">
                         <p className="text-gray-500 text-sm">Transaksi Hari Ini</p>
                         <h2 className="text-4xl font-bold mt-3 text-gray-800">
@@ -121,7 +117,6 @@ function Dashboard() {
                         </h2>
                     </div>
 
-                    {/* REVENUE */}
                     <div className="bg-gradient-to-r from-[#2F5231] to-[#1e3a20] text-white rounded-3xl p-6 shadow-xl min-w-0">
                         <p className="text-white/70 text-sm">Revenue Hari Ini</p>
                         <h2 className="text-3xl font-bold mt-3">
@@ -129,7 +124,6 @@ function Dashboard() {
                         </h2>
                     </div>
 
-                    {/* AVG */}
                     <div className="bg-white rounded-3xl p-6 shadow-lg">
                         <p className="text-gray-500 text-sm">Avg Transaction</p>
                         <h2 className="text-2xl font-bold mt-3 text-gray-800">
@@ -137,7 +131,6 @@ function Dashboard() {
                         </h2>
                     </div>
 
-                    {/* TOP MENU */}
                     <div className="bg-white rounded-3xl p-6 shadow-lg">
                         <p className="text-gray-500 text-sm">Top Menu</p>
                         <h2 className="text-2xl font-bold mt-3 text-gray-800">
@@ -146,9 +139,7 @@ function Dashboard() {
                     </div>
                 </div>
 
-                {/* CHARTS */}
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    {/* REVENUE CHART */}
                     <div className="bg-white rounded-3xl p-6 shadow-lg">
                         <div className="mb-6">
                             <h2 className="text-xl font-bold text-gray-800">Revenue Trend</h2>
@@ -168,7 +159,6 @@ function Dashboard() {
                         </div>
                     </div>
 
-                    {/* TOP MENU */}
                     <div className="bg-white rounded-3xl p-6 shadow-lg min-w-0">
                         <div className="mb-6">
                             <h2 className="text-xl font-bold text-gray-800">Top Selling Menu</h2>

@@ -1,15 +1,9 @@
 import Swal from "sweetalert2";
 
 function ModalForm({
-    isOpen,
-    title,
-    form,
-    setForm,
-    onClose,
-    onSubmit,
-    isDirty,
-    setIsDirty,
-    children,
+    isOpen, title, form,
+    setForm, onClose, onSubmit,
+    isDirty, setIsDirty, children,
 }) {
 
     if (!isOpen) return null;
@@ -40,22 +34,28 @@ function ModalForm({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div 
+            <div
                 className="absolute inset-0 bg-gray-900/40"
+                role="button"
+                tabIndex={0}
+                aria-label="Close modal"
                 onClick={handleCancel}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        handleCancel();
+                    }
+                }}
             />
             
             <div className="relative bg-white rounded-2xl w-full max-w-md shadow-2xl">
-                {/* Decorative circle */}
                 <div className="absolute -top-3 -right-3 w-20 h-20 bg-[#2F5231]/10 rounded-full blur-2xl"></div>
                 <div className="absolute -bottom-3 -left-3 w-20 h-20 bg-[#2F5231]/10 rounded-full blur-2xl"></div>
                 
-                {/* Close button top right */}
                 <button
                     onClick={handleCancel}
                     className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
                 >
-                    ✕
+                    X
                 </button>
                 
                 <div className="p-6 pt-8">

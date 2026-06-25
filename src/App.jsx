@@ -117,11 +117,15 @@ const AdminCabang = lazy(() =>
 );
 
 const BannerManagement = lazy(() =>
-  import("./pages/super_admin/BannerManagment")
+  import("./pages/super_admin/BannerManagement")
 );
 
 const VoucherManagement = lazy(() =>
   import("./pages/super_admin/VoucherManagement")
+);
+
+const FeeManagement = lazy(() =>
+  import("./pages/super_admin/FeeManagement")
 );
 
 function App() {
@@ -316,6 +320,11 @@ function App() {
                 <Route
                   path="vouchers"
                   element={<VoucherManagement />}
+                />
+
+                <Route
+                  path="fees"
+                  element={<FeeManagement />}
                 />
 
               </Route>

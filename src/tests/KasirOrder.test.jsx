@@ -1,6 +1,6 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, test, expect, beforeEach } from "vitest";
 import AuthContext from "../context/AuthContext";
 import KasirOrder from "../pages/admin/KasirOrder";
 import API from "../services/api";
@@ -43,7 +43,10 @@ const mockMenus = [
 ];
 
 const mockCategories = [
-    { id: 1, name: "Coffee" },
+    {
+        id: 1,
+        name: "Coffee",
+    },
 ];
 
 function renderPage() {
@@ -58,7 +61,6 @@ function renderPage() {
                 },
             }}
         >
-
             <BrowserRouter>
                 <KasirOrder />
             </BrowserRouter>
@@ -67,9 +69,13 @@ function renderPage() {
 }
 
 describe("KasirOrder Page", () => {
+
     beforeEach(() => {
+
         vi.clearAllMocks();
+
         API.get.mockImplementation((url) => {
+
             if (url.includes("/menus")) {
 
                 return Promise.resolve({
@@ -78,6 +84,7 @@ describe("KasirOrder Page", () => {
                     },
                 });
             }
+
             if (url.includes("/categories")) {
 
                 return Promise.resolve({
@@ -86,75 +93,142 @@ describe("KasirOrder Page", () => {
                     },
                 });
             }
-            return Promise.reject(new Error("Unknown endpoint"));
+
+            return Promise.reject(
+                new Error("Unknown endpoint")
+            );
         });
     });
 
-    it("renders loading state", () => {
-        API.get.mockImplementation(() => new Promise(() => { }));
+    test("menampilkan loading state", () => {
+
+        API.get.mockImplementation(
+            () => new Promise(() => {})
+        );
+
         renderPage();
-        expect(document.querySelector(".animate-spin")).toBeInTheDocument();
+
+        expect(
+            document.querySelector(".animate-spin")
+        ).toBeInTheDocument();
     });
 
-    it("renders menu items", async () => {
+    test("menampilkan daftar menu", async () => {
+
         renderPage();
-        expect(await screen.findByText("Americano")).toBeInTheDocument();
-        expect(screen.getByText("Latte")).toBeInTheDocument();
+
+        expect(
+            await screen.findByText("Americano")
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText("Latte")
+        ).toBeInTheDocument();
     });
 
-    it("adds menu to cart", async () => {
+    test("menambahkan menu ke cart", async () => {
+
         renderPage();
-        const addButtons = await screen.findAllByText(/tambah/i);
+
+        const addButtons =
+            await screen.findAllByText(/tambah/i);
+
         fireEvent.click(addButtons[0]);
-        expect(screen.getAllByText("Americano")).toHaveLength(2);
+
+        expect(
+            screen.getAllByText("Americano")
+        ).toHaveLength(2);
     });
 
-    it("increases quantity", async () => {
+    test("menambah quantity menu", async () => {
+
         renderPage();
-        const addButtons = await screen.findAllByText(/tambah/i);
+
+        const addButtons =
+            await screen.findAllByText(/tambah/i);
+
         fireEvent.click(addButtons[0]);
-        const plusButtons = await screen.findAllByText("+");
+
+        const plusButtons =
+            await screen.findAllByText("+");
+
         fireEvent.click(plusButtons[0]);
-        expect(screen.getByText("2")).toBeInTheDocument();
+
+        expect(
+            screen.getByText("2")
+        ).toBeInTheDocument();
     });
 
-    it("decreases quantity", async () => {
+    test("mengurangi quantity menu", async () => {
+
         renderPage();
-        const addButtons = await screen.findAllByText(/tambah/i);
+
+        const addButtons =
+            await screen.findAllByText(/tambah/i);
+
         fireEvent.click(addButtons[0]);
-        const plusButtons = await screen.findAllByText("+");
+
+        const plusButtons =
+            await screen.findAllByText("+");
+
         fireEvent.click(plusButtons[0]);
-        const minusButtons = await screen.findAllByText("-");
+
+        const minusButtons =
+            await screen.findAllByText("-");
+
         fireEvent.click(minusButtons[0]);
-        expect(screen.getByText("1")).toBeInTheDocument();
+
+        expect(
+            screen.getByText("1")
+        ).toBeInTheDocument();
     });
 
-    it("calculates total correctly", async () => {
+    test("menghitung total pembayaran dengan benar", async () => {
+
         renderPage();
-        const addButtons = await screen.findAllByText(/tambah/i);
+
+        const addButtons =
+            await screen.findAllByText(/tambah/i);
+
         fireEvent.click(addButtons[0]);
-        expect(screen.getAllByText(/18.000/i)).toHaveLength(3);
+
+        expect(
+            screen.getAllByText(/18.000/i)
+        ).toHaveLength(3);
     });
 
-    it("shows table number input for dine in", async () => {
+    test("menampilkan input nomor meja untuk dine in", async () => {
+
         renderPage();
+
         await screen.findByText("Americano");
-        expect(screen.getByPlaceholderText(/no. meja/i)).toBeInTheDocument();
+
+        expect(
+            screen.getByPlaceholderText(/no. meja/i)
+        ).toBeInTheDocument();
     });
 
-    it("hides table number input for take away", async () => {
+    test("menyembunyikan input nomor meja untuk take away", async () => {
+
         renderPage();
+
         await screen.findByText("Americano");
-        const select = screen.getByDisplayValue(/dine in/i);
+
+        const select =
+            screen.getByDisplayValue(/dine in/i);
+
         fireEvent.change(select, {
             target: {
                 value: "take_away",
             },
         });
-        expect(screen.queryByPlaceholderText(/nomor meja/i)).not.toBeInTheDocument();
+
+        expect(
+            screen.queryByPlaceholderText(/nomor meja/i)
+        ).not.toBeInTheDocument();
     });
 
-    it("submits order successfully", async () => {
+    test("memproses pesanan berhasil", async () => {
 
         API.post.mockResolvedValue({
             data: {
@@ -164,19 +238,44 @@ describe("KasirOrder Page", () => {
         });
 
         renderPage();
-        const addButtons = await screen.findAllByText(/tambah/i);
+
+        const addButtons =
+            await screen.findAllByText(/tambah/i);
+
         fireEvent.click(addButtons[0]);
-        const submitButton = screen.getByText(/buat pesanan/i);
+
+        const submitButton =
+            screen.getByText(/buat pesanan/i);
+
         fireEvent.click(submitButton);
-        await waitFor(() => { expect(API.post).toHaveBeenCalled(); });
-        expect(Swal.fire).toHaveBeenCalledWith(expect.objectContaining({ icon: "success" }));
+
+        await waitFor(() => {
+
+            expect(API.post).toHaveBeenCalled();
+        });
+
+        expect(Swal.fire).toHaveBeenCalledWith(
+            expect.objectContaining({
+                icon: "success",
+            })
+        );
     });
 
-    it("shows warning when cart is empty", async () => {
+    test("menampilkan warning ketika cart kosong", async () => {
+
         renderPage();
+
         await screen.findByText("Americano");
-        const submitButton = screen.getByText(/buat pesanan/i);
+
+        const submitButton =
+            screen.getByText(/buat pesanan/i);
+
         fireEvent.click(submitButton);
-        expect(Swal.fire).toHaveBeenCalledWith(expect.objectContaining({ icon: "warning" }));
+
+        expect(Swal.fire).toHaveBeenCalledWith(
+            expect.objectContaining({
+                icon: "warning",
+            })
+        );
     });
 });

@@ -32,7 +32,7 @@ function AdminProductDetail() {
         setForm({
             category_id: item.category_id,
             name: item.name,
-            description: item.description,
+            description: item.description ?? "",
             base_price: item.base_price,
             is_active: item.is_active,
             image_url: item.image_url,
@@ -78,7 +78,7 @@ function AdminProductDetail() {
         let countdown = 5;
         let interval;
         const result = await Swal.fire({
-            title: "⚠️ Hapus Menu",
+            title: "Hapus Menu ?",
             html: `
                 <div class="text-left">
                     <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700 mb-4">
@@ -187,7 +187,6 @@ function AdminProductDetail() {
     return (
         <div className="min-h-[calc(100vh-64px)] bg-[#F5F1E5] py-8 px-4 md:px-8">
             <div className="max-w-3xl mx-auto space-y-6">
-                {/* Top Bar with back button */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                         <button
@@ -210,16 +209,13 @@ function AdminProductDetail() {
                     </div>
                 </div>
 
-                {/* Form Card */}
                 <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-                    {/* Card Header */}
                     <div className="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
                         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Detail Informasi Menu</span>
                         <span className="text-[11px] text-gray-400 font-semibold">ID: #{id}</span>
                     </div>
 
                     <div className="p-6 md:p-8 space-y-6">
-                        {/* Section 1: Main Info */}
                         <div className="space-y-4">
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
@@ -236,7 +232,7 @@ function AdminProductDetail() {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                    Deskripsi Menu
+                                    Deskripsi Menu <span className="text-red-500">*</span>
                                 </label>
                                 <textarea
                                     name="description"
@@ -249,7 +245,6 @@ function AdminProductDetail() {
                             </div>
                         </div>
 
-                        {/* Section 2: Pricing & Category */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-5 border-t border-gray-100">
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
@@ -287,10 +282,9 @@ function AdminProductDetail() {
                             </div>
                         </div>
 
-                        {/* Section 3: Media Upload */}
                         <div className="pt-5 border-t border-gray-100">
                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-                                Foto Menu (Upload)
+                                Foto Menu (Upload) <span className="text-red-500">*</span>
                             </label>
                             <div className="flex flex-col sm:flex-row items-center gap-4 p-4 border border-dashed border-gray-200 rounded-2xl bg-gray-50/50">
                                 {imagePreview ? (
@@ -320,7 +314,6 @@ function AdminProductDetail() {
                             </div>
                         </div>
 
-                        {/* Section 4: Status Configuration */}
                         <div className="pt-5 border-t border-gray-100 space-y-3">
                             <div>
                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
@@ -339,7 +332,6 @@ function AdminProductDetail() {
                         </div>
                     </div>
 
-                    {/* Card Footer Actions */}
                     <div className="px-6 py-5 bg-gray-50 border-t border-gray-100 flex flex-col-reverse sm:flex-row gap-3 justify-between items-center">
                         <button
                             type="button"

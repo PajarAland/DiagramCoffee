@@ -20,7 +20,8 @@ function Checkout() {
     const [vouchers, setVouchers] = useState([]);
     const [voucherId, setVoucherId] = useState(null);
     const [selectedVoucher, setSelectedVoucher] = useState(null);
-    const adminFee = 2000;
+    const [previewData, setPreviewData] = useState(null);
+    const [previewLoading, setPreviewLoading] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -38,17 +39,39 @@ function Checkout() {
         fetchVouchers();
     }, [user]);
 
+    useEffect(() => {
+        const fetchPreview = async () => {          
+            try {
+                if (!cartItems.length) return;
+                if (!selectedBranch) return;
+                setPreviewLoading(true);
+
+                const payload = {
+                    branch_id: Number(selectedBranch),
+                    voucher_id: voucherId,
+                    items: cartItems.map((item) => ({
+                        menu_item_id: item.id,
+                        quantity: item.qty,
+                    })),
+                };
+                const res = await API.post("/api/orders/preview", payload);
+                setPreviewData(res.data.data);
+            } catch (err) {
+                console.error("Preview Error:", err);
+            } finally {
+                setPreviewLoading(false);
+            }
+        };
+        fetchPreview();
+    }, [cartItems, voucherId, selectedBranch]);
+
     const total = useMemo(() => {
         return cartItems.reduce((acc, item) => acc + Number(item.final_price || item.base_price) * item.qty, 0);
     }, [cartItems]);
 
-    const discountAmount = useMemo(() => {
-        if (!selectedVoucher) return 0;
-        if ((total + adminFee) < Number(selectedVoucher.voucher?.min_transaction_amount)) return 0;
-        return Number(selectedVoucher.voucher?.discount_amount || 0);
-    }, [total, selectedVoucher]);
-
-    const grandTotal = useMemo(() => total + adminFee - discountAmount, [total, discountAmount]);
+    const discountAmount = Number(previewData?.voucher?.voucher_discount || 0);
+    const branchDiscount = Math.max(0, Number(previewData?.discount_total || 0) - discountAmount);
+    const grandTotal = Number(previewData?.total_amount || total);
     const selectedBranchId = Number(selectedBranch);
 
     const handleCheckout = async () => {
@@ -60,6 +83,10 @@ function Checkout() {
             if (!selectedBranchId) {
                 alert("Silakan pilih cabang terlebih dahulu");
                 return;
+            }
+            if ( orderType === "dine_in" && !tableNumber) {
+                    alert("Nomor meja wajib diisi");
+                    return;
             }
             setLoading(true);
             const payload = {
@@ -95,7 +122,6 @@ function Checkout() {
     return (
         <div className="min-h-screen py-6 px-4">
             <div className="max-w-4xl mx-auto">
-                {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-[#2F5231]">
@@ -109,14 +135,12 @@ function Checkout() {
                         onClick={() => navigate(-1)}
                         className="px-4 py-2 rounded-lg border border-[#2F5231] text-[#2F5231] text-sm font-medium hover:bg-[#2F5231] hover:text-white transition-colors"
                     >
-                        ← Kembali
+                        Kembali
                     </button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column - Forms & Items */}
                     <div className="lg:col-span-2 space-y-5">
-                        {/* Customer Info */}
                         <div className="bg-white rounded-xl p-5 shadow-sm">
                             <h2 className="text-lg font-bold mb-4 text-gray-800">
                                 Informasi Customer
@@ -172,7 +196,6 @@ function Checkout() {
                             </div>
                         </div>
 
-                        {/* Order Items */}
                         <div className="bg-white rounded-xl p-5 shadow-sm">
                             <h2 className="text-lg font-bold mb-4 text-gray-800">
                                 Pesanan ({cartItems.length} item)
@@ -185,7 +208,7 @@ function Checkout() {
                                         onClick={() => navigate('/menu')}
                                         className="mt-3 text-[#2F5231] text-sm font-medium hover:underline"
                                     >
-                                        Lihat Menu →
+                                        Lihat Menu
                                     </button>
                                 </div>
                             ) : (
@@ -214,7 +237,6 @@ function Checkout() {
                         </div>
                     </div>
 
-                    {/* Right Column - Payment Summary */}
                     <div>
                         <div className="bg-white rounded-xl p-5 shadow-sm sticky top-6">
                             <h2 className="text-lg font-bold mb-4 text-gray-800">
@@ -222,30 +244,52 @@ function Checkout() {
                             </h2>
 
                             <div className="space-y-3">
-                                {discountAmount > 0 && (
-                                    <div className="flex justify-between text-sm text-green-600">
-                                        <span>Diskon Voucher</span>
-                                        <span>-Rp{discountAmount.toLocaleString("id-ID")}</span>
+                                {previewLoading ? (
+                                    <div className="text-sm text-gray-400">
+                                        Menghitung total...
                                     </div>
+                                ) : (
+                                    <>
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-gray-600">Subtotal</span>
+                                        <span className="font-medium text-gray-800">
+                                            Rp{Number(previewData?.subtotal || total).toLocaleString("id-ID")}
+                                        </span>
+                                    </div>
+                                    {previewData?.fees?.map((fee) => (
+                                        <div key={fee.key} className="flex justify-between text-sm">
+                                            <span className="text-gray-600">
+                                                {fee.label}
+                                            </span>
+
+                                            <span className="font-medium text-gray-800">
+                                                Rp{Number(fee.amount).toLocaleString("id-ID")}
+                                            </span>
+                                        </div>
+                                    ))}
+                                    {discountAmount > 0 && (
+                                        <div className="flex justify-between text-sm text-green-600">
+                                            <span>Diskon Voucher</span>
+                                            <span>-Rp{discountAmount.toLocaleString("id-ID")}</span>
+                                        </div>
+                                    )}
+
+                                    {branchDiscount > 0 && (
+                                        <div className="flex justify-between text-sm text-green-600">
+                                            <span>Promo Cabang</span>
+                                            <span>
+                                                -Rp{branchDiscount.toLocaleString("id-ID")}
+                                            </span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between text-base font-bold pt-3 border-t border-gray-200">
+                                        <span className="text-gray-800">Total</span>
+                                        <span className="text-[#2F5231] text-xl">
+                                            Rp{grandTotal.toLocaleString("id-ID")}
+                                        </span>
+                                    </div>
+                                    </>
                                 )}
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Subtotal</span>
-                                    <span className="font-medium text-gray-800">
-                                        Rp{total.toLocaleString("id-ID")}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-gray-600">Admin Fee</span>
-                                    <span className="font-medium text-gray-800">
-                                        Rp{adminFee.toLocaleString("id-ID")}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between text-base font-bold pt-3 border-t border-gray-200">
-                                    <span className="text-gray-800">Total</span>
-                                    <span className="text-[#2F5231] text-xl">
-                                        Rp{grandTotal.toLocaleString("id-ID")}
-                                    </span>
-                                </div>
                             </div>
 
                             {user && vouchers.length > 0 && (
@@ -261,12 +305,10 @@ function Checkout() {
                                                 {selectedVoucher ? selectedVoucher.voucher?.name : `${vouchers.length} voucher tersedia`}
                                             </p>
                                         </div>
-                                        <span className="text-[#2F5231] text-lg">→</span>
                                     </button>
                                 </div>
                             )}
 
-                            {/* Payment Method Selection */}
                             <div className="mt-6">
                                 <h3 className="text-sm font-semibold text-gray-700 mb-3">
                                     Metode Pembayaran
@@ -280,17 +322,16 @@ function Checkout() {
                                             checked={paymentMethod === "xendit"}
                                             onChange={(e) => setPaymentMethod(e.target.value)}
                                             className="w-4 h-4 text-[#2F5231]"
+                                            aria-label="Metode pembayaran Xendit"
                                         />
                                         <div className="flex-1">
                                             <p className="text-sm font-medium text-gray-800">Xendit</p>
                                             <p className="text-xs text-gray-400">QRIS / E-Wallet</p>
                                         </div>
-                                        <span className="text-lg">💳</span>
                                     </label>
                                 </div>
                             </div>
 
-                            {/* Checkout Button */}
                             <button
                                 onClick={handleCheckout}
                                 disabled={loading || cartItems.length === 0}
@@ -310,21 +351,23 @@ function Checkout() {
             {showVoucherModal && (
                 <div className="fixed inset-0 bg-black/40 z-50 flex items-end md:items-center justify-center">
                     <div className="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-3xl p-5 max-h-[80vh] overflow-hidden flex flex-col">
-                        {/* HEADER */}
                         <div className="flex items-center justify-between mb-5">
                             <div>
                                 <h2 className="text-xl font-bold text-[#2F5231]">Pilih Voucher</h2>
                                 <p className="text-sm text-gray-400 mt-1">Gunakan voucher untuk diskon</p>
                             </div>
-                            <button onClick={() => setShowVoucherModal(false)} className="w-10 h-10 rounded-full hover:bg-gray-100 transition-all">✕</button>
+                            <button onClick={() => setShowVoucherModal(false)} className="w-10 h-10 rounded-full hover:bg-gray-100 transition-all" aria-label="Tutup">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
 
-                        {/* LIST */}
                         <div className="flex-1 overflow-y-auto space-y-3">
                             {vouchers.map((item) => {
                                 const voucher = item?.voucher || {};
                                 const minTransaction = Number(voucher?.min_transaction_amount || 0);
-                                const disabled = (total + adminFee) < minTransaction;
+                                const disabled = false;
                                 const selected = voucherId === item.id;
 
                                 return (
@@ -363,7 +406,6 @@ function Checkout() {
                             })}
                         </div>
 
-                        {/* REMOVE */}
                         {selectedVoucher && (
                             <button
                                 type="button"

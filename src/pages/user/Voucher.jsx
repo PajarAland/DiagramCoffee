@@ -95,21 +95,18 @@ function Voucher() {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8 md:px-8 space-y-10">
             <div className="max-w-7xl mx-auto">
-                {/* HEADER */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Loyalty Voucher</h1>
-                        <p className="text-gray-500 mt-2">Tukarkan poin loyalty Anda dengan voucher menarik ☕</p>
+                        <p className="text-gray-500 mt-2">Tukarkan poin loyalty Anda dengan voucher menarik</p>
                     </div>
-                    {/* POINT CARD */}
                     <div className="bg-gradient-to-r from-[#2F5231] to-[#1e3a20] text-white rounded-3xl px-6 py-5 shadow-xl min-w-[240px]">
                         <p className="text-sm text-white/70">Loyalty Points</p>
                         <h2 className="text-4xl font-bold mt-2">{user?.loyalty_points || 0}</h2>
-                        <p className="text-xs text-white/60 mt-2">Kumpulkan lebih banyak poin dari transaksi ☕</p>
+                        <p className="text-xs text-white/60 mt-2">Kumpulkan lebih banyak poin dari transaksi</p>
                     </div>
                 </div>
 
-                {/* VOUCHER GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {vouchers.map((voucher) => {
                         const enoughPoints = (user?.loyalty_points || 0) >= voucher.points_required;
@@ -123,7 +120,6 @@ function Voucher() {
                                     <p className="mt-3 text-sm text-white/80">{voucher.name}</p>
                                 </div>
 
-                                {/* BODY */}
                                 <div className="p-6">
                                     <div className="space-y-3">
                                         <div className="flex justify-between text-sm">
@@ -140,7 +136,6 @@ function Voucher() {
                                         </div>
                                     </div>
 
-                                    {/* BUTTON */}
                                     <button
                                         onClick={() => handleExchange(voucher)}
                                         disabled={!enoughPoints || exchangingId === voucher.id}

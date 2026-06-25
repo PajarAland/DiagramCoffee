@@ -78,7 +78,6 @@ function Profile() {
                 </div>
 
                 <form onSubmit={handleUpdateProfile} className="space-y-5">
-                    {/* NAME */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Nama</label>
                         <div className="relative">
@@ -93,7 +92,6 @@ function Profile() {
                         </div>
                     </div>
 
-                    {/* EMAIL */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                         <div className="relative">
@@ -114,7 +112,6 @@ function Profile() {
                         )}
                     </div>
 
-                    {/* LOYALTY */}
                     {user?.role === "customer" && (
                         <div className="bg-[#F8F5F0] rounded-2xl p-4">
                             <p className="text-xs text-gray-500 mb-1">Loyalty Points</p>

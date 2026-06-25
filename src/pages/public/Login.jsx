@@ -13,9 +13,11 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [remember, setRemember] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        if (loading) return;
 
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
@@ -30,8 +32,7 @@ function Login() {
             return;
         }
 
-        // Email format validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const emailRegex = /^\S+@\S+\.\S+$/;
 
         if (!emailRegex.test(trimmedEmail)) {
             Swal.fire({
@@ -42,7 +43,6 @@ function Login() {
             return;
         }
 
-        // CSRF SAFE CHECK
         const ensureCSRF = async () => {
             const hasCookie = document.cookie.includes("XSRF-TOKEN");
 
@@ -52,10 +52,9 @@ function Login() {
         };
 
         try {
-            // 1. pastikan CSRF ada
+            setLoading(true);
             await ensureCSRF();
 
-            // 2. baru login request
             const response = await API.post("/api/login", {
                 email: trimmedEmail,
                 password: trimmedPassword,
@@ -109,6 +108,8 @@ function Login() {
                     text: error.response?.data?.message || "Terjadi kesalahan",
                 });
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -167,15 +168,36 @@ function Login() {
 
                     <button
                         type="submit"
-                        className="w-10/12 mx-auto bg-[#2F5231] text-white py-2 rounded-lg relative flex items-center justify-center mt-2"
-                        >
-                        <span className="text-center">Masuk</span>
+                        disabled={loading}
+                        className={`
+                            w-10/12 mx-auto
+                            py-2 rounded-lg mt-2
+                            relative flex items-center justify-center
+                            transition-all duration-200
+                            ${
+                                loading
+                                    ? "bg-[#5C7A5E] cursor-not-allowed opacity-70"
+                                    : "bg-[#2F5231] hover:bg-[#446346]"
+                            }
+                            text-white
+                        `}
+                    >
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                <span>Loading...</span>
+                            </div>
+                        ) : (
+                            <>
+                                <span className="text-center">Masuk</span>
 
-                        <img
-                            src={arrowIconWhite}
-                            alt="arrow"
-                            className="w-6 h-6 absolute right-4"
-                        />
+                                <img
+                                    src={arrowIconWhite}
+                                    alt="arrow"
+                                    className="w-6 h-6 absolute right-4"
+                                />
+                            </>
+                        )}
                     </button>
                 </form>
 

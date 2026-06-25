@@ -13,12 +13,7 @@ function Menu() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [searchParams] = useSearchParams();
-
-    const [activeCategory, setActiveCategory]
-        = useState(
-            searchParams.get("category")
-                || "Semua"
-        );
+    const [activeCategory, setActiveCategory] = useState(searchParams.get("category") || "Semua");
     
     useEffect(() => {
         const fetchData = async () => {
@@ -33,15 +28,11 @@ function Menu() {
 
                 const [menuResponse, categoryResponse] =
                     await Promise.all([
-                        API.get(
-                            `/api/branches/${branchId}/menus`
-                        ),
+                        API.get(`/api/branches/${branchId}/menus`),                                   
                         API.get("/api/categories"),
                     ]);
 
-                setMenuItems(
-                    menuResponse.data.data || []
-                );
+                setMenuItems(menuResponse.data.data || []);            
 
                 setCategories([
                     {
@@ -52,47 +43,25 @@ function Menu() {
                 ]);
 
             } catch (err) {
-
                 console.error(err);
-
             } finally {
-
                 setLoading(false);
-
             }
-
         };
-
         fetchData();
-
     }, [selectedBranch]);
 
     const filteredMenus = useMemo(() => {
-
         return menuItems.filter((item) => {
-
-            const matchesCategory =
-                activeCategory === "Semua"
-                    ? true
-                    : item.category === activeCategory;
-
-            const matchesSearch =
-                item.name
-                    ?.toLowerCase()
-                    .includes(search.toLowerCase());
-
+            const matchesCategory = activeCategory === "Semua" ? true : item.category === activeCategory; 
+            const matchesSearch = item.name?.toLowerCase().includes(search.toLowerCase());
             return matchesCategory && matchesSearch;
-
         });
-
     }, [menuItems, activeCategory, search]);
 
     return (
         <main className="max-w-7xl mx-auto px-4 py-8 md:px-8 space-y-10">
-
-            {/* HEADER */}
             <section className="space-y-4">
-
                 <div>
                     <h1 className="text-2xl md:text-4xl font-bold text-[#1E1E1E]">
                         Menu
@@ -103,7 +72,6 @@ function Menu() {
                     </p>
                 </div>
 
-                {/* SEARCH */}
                 <div>
                     <input
                         type="text"
@@ -124,18 +92,12 @@ function Menu() {
                         "
                     />
                 </div>
-
             </section>
 
-            {/* CATEGORY */}
             <section className="overflow-x-auto scrollbar-hide">
-
                 <div className="flex gap-3 w-max">
-
                     {categories.map((category) => {
-
-                        const active =
-                            activeCategory === category.name;
+                        const active = activeCategory === category.name;                    
 
                         return (
                             <button
@@ -160,18 +122,14 @@ function Menu() {
                             </button>
                         );
                     })}
-
                 </div>
-
             </section>
-
-            {/* CONTENT */}
             <section>
 
                 {loading ? (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
-                        {[...Array(8)].map((_, index) => (
+                        {[...Array(5)].map((_, index) => (
                             <div
                                 key={index}
                                 className="
@@ -219,9 +177,7 @@ function Menu() {
 
                     </div>
                 )}
-
             </section>
-
         </main>
     );
 }

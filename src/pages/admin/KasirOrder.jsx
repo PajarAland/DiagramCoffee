@@ -31,10 +31,6 @@ function KasirOrder() {
             .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
-    // ==============================
-    // FETCH DATA
-    // ==============================
-
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
@@ -67,10 +63,6 @@ function KasirOrder() {
         load();
     }, [branchId, fetchData]);
 
-    // ==============================
-    // FILTERED MENUS
-    // ==============================
-
     const filteredMenus = useMemo(() => {
         if (selectedCategory === "all") {
             return menus;
@@ -79,10 +71,6 @@ function KasirOrder() {
         
         return menus.filter((item) => item.category === selectedCategoryData?.name);
     }, [menus, categories, selectedCategory]);
-
-    // ==============================
-    // CART
-    // ==============================
 
     const addToCart = (menu) => {
         const existing = cart.find((item) => item.id === menu.id);
@@ -123,17 +111,9 @@ function KasirOrder() {
         );
     };
 
-    // ==============================
-    // TOTAL
-    // ==============================
-
     const total = useMemo(() => {
         return cart.reduce((acc, item) => acc + item.price * item.qty, 0);
     }, [cart]);
-
-    // ==============================
-    // SUBMIT
-    // ==============================
 
     const handleSubmit = async () => {
         try {
@@ -194,9 +174,6 @@ function KasirOrder() {
         }
     };
 
-    // ==============================
-    // LOADING
-    // ==============================
 
     if (loading) {
         return (
@@ -209,11 +186,9 @@ function KasirOrder() {
     return (
         <div className="w-full h-[calc(100dvh-32px)] md:h-[calc(100dvh-48px)] lg:h-[calc(100dvh-64px)] flex flex-col min-h-0 overflow-hidden">
             <div className="h-full flex bg-white rounded-2xl md:rounded-3xl border border-gray-200/80 shadow-sm overflow-hidden flex-grow min-h-0">
-                {/* LEFT */}
                 <div className={`flex-1 p-6 flex flex-col h-full min-h-0 overflow-hidden ${showCartMobile ? "hidden lg:flex" : "flex"}`}>
                     <h1 className="text-3xl font-bold text-[#2F5231] mb-6">Kasir Order</h1>
 
-                    {/* CATEGORY */}
                     <div className="flex gap-2 mb-6 flex-wrap">
                         <button
                             onClick={() => setSelectedCategory("all")}
@@ -236,7 +211,6 @@ function KasirOrder() {
                         ))}
                     </div>
 
-                    {/* MENUS */}
                     <div className="overflow-y-auto min-h-0 grid grid-cols-2 lg:grid-cols-3 gap-4 pr-1 content-start auto-rows-max">
                         {filteredMenus.map((menu) => (
                             <div key={menu.id} className="bg-white rounded-3xl p-4 border border-[#ECE6DC] hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between">
@@ -255,12 +229,10 @@ function KasirOrder() {
                     </div>
                 </div>
 
-                {/* RIGHT */}
                 <div className={`w-full lg:w-[420px] border-l border-[#ECE6DC] bg-white p-6 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.03)] h-full overflow-hidden min-h-0 ${
                     showCartMobile ? "flex" : "hidden lg:flex"
                 }`}>
                     <div className="flex items-center gap-3 mb-6">
-                        {/* Mobile Back Button in Cart */}
                         <button
                             onClick={() => setShowCartMobile(false)}
                             className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
@@ -273,7 +245,6 @@ function KasirOrder() {
                     <div className="flex-1 overflow-y-auto space-y-4">
                         {cart.length === 0 && (
                             <div className="flex flex-col items-center justify-center h-full text-center text-gray-400 py-20">
-                                <div className="text-5xl mb-4">☕</div>
                                 <p className="font-medium">Cart masih kosong</p>
                                 <p className="text-sm">Tambahkan menu terlebih dahulu</p>
                             </div>
@@ -293,9 +264,7 @@ function KasirOrder() {
                         ))}
                     </div>
 
-                    {/* FORM */}
                     <div className="mt-4 pt-4 border-t border-[#ECE6DC] bg-white space-y-3 shrink-0">
-                        {/* Compact 2-column Inputs */}
                         <div className="grid grid-cols-2 gap-3">
                             <div>
                                 <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Nama Pelanggan</label>
@@ -357,7 +326,6 @@ function KasirOrder() {
                             />
                         </div>
 
-                        {/* Total & Checkout */}
                         <div className="pt-2">
                             <div className="flex justify-between items-center mb-3">
                                 <span className="text-sm font-medium text-gray-500">Total</span>
@@ -381,7 +349,6 @@ function KasirOrder() {
                     </div>
                 </div>
 
-                {/* PAYMENT MODAL */}
                 {showPaymentModal && (
                     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                         <div className="bg-white rounded-3xl p-6 w-[500px]">
@@ -408,7 +375,6 @@ function KasirOrder() {
                     </div>
                 )}
 
-                {/* Floating Mobile Cart Button */}
                 {cart.length > 0 && !showCartMobile && (
                     <button
                         onClick={() => setShowCartMobile(true)}

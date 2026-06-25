@@ -72,7 +72,6 @@ function Cabang() {
                 <div class="text-left space-y-4">
                     <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-3 text-sm">
                         <div class="flex items-start gap-2">
-                            <span class="text-red-500 text-lg">⚠️</span>
                             <div class="flex-1">
                                 <p class="font-semibold text-red-700 mb-1">Peringatan!</p>
                                 <p class="text-red-600 text-xs">Data yang dihapus tidak dapat dikembalikan</p>
@@ -210,7 +209,6 @@ function Cabang() {
                 title: "Berhasil Dihapus!",
                 html: `
                     <div class="text-center">
-                        <div class="text-3xl mb-2">🗑️</div>
                         <p class="text-gray-600">${branch.name} telah dihapus dari sistem</p>
                     </div>
                 `,
@@ -284,7 +282,6 @@ function Cabang() {
 
     return (
         <main className="flex-1 p-6 overflow-auto">
-            {/* Header Section */}
             <div className="mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
@@ -299,15 +296,13 @@ function Cabang() {
                             setIsDirty(false);
                             setIsModalOpen(true);
                         }}
-                        className="bg-[#2F5231] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1e3a20] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm flex items-center gap-2"
+                        className="inline-flex items-center gap-2 bg-[#2F5231] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1e3a20] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
                     >
-                        <span className="text-lg">+</span>
-                        Tambah Cabang
+                        + Tambah Cabang
                     </button>
                 </div>
             </div>
 
-            {/* Search Bar */}
             <div className="mb-6">
                 <div className="relative max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -325,9 +320,7 @@ function Cabang() {
                 </div>
             </div>
 
-            {/* Table */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                {/* Table Header */}
                 <div className="hidden md:grid grid-cols-6 bg-[#EAE5D8] px-6 py-4 text-sm font-semibold text-[#2F5231] gap-4">
                     <div>Nama Cabang</div>
                     <div>Alamat</div>
@@ -337,7 +330,6 @@ function Cabang() {
                     <div className="text-center">Aksi</div>
                 </div>
 
-                {/* Loading State */}
                 {loading && (
                     <div className="p-12 text-center">
                         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-[#2F5231] border-t-transparent"></div>
@@ -345,10 +337,8 @@ function Cabang() {
                     </div>
                 )}
 
-                {/* Table Body */}
                 {!loading && filtered.map((item) => (
                     <div key={item.id} className="block md:grid md:grid-cols-6 px-4 md:px-6 py-4 border-t border-gray-100 hover:bg-gray-50 transition-colors gap-4">
-                        {/* Mobile Card View */}
                         <div className="md:hidden space-y-2 mb-3">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -376,7 +366,6 @@ function Cabang() {
                             </div>
                         </div>
 
-                        {/* Desktop View */}
                         <div className="hidden md:block font-medium text-gray-800">{item.name}</div>
                         <div className="hidden md:block text-gray-600 text-sm truncate">{item.address}</div>
                         <div className="hidden md:block text-sm">{item.phone}</div>
@@ -405,7 +394,6 @@ function Cabang() {
                     </div>
                 ))}
 
-                {/* Empty State */}
                 {!loading && filtered.length === 0 && (
                     <div className="p-12 text-center">
                         <div className="text-4xl mb-3">🏢</div>
@@ -417,14 +405,12 @@ function Cabang() {
                 )}
             </div>
 
-            {/* Stats Footer */}
             {!loading && branches.length > 0 && (
                 <div className="mt-4 text-xs text-gray-400">
                     Menampilkan {filtered.length} dari {branches.length} cabang
                 </div>
             )}
 
-            {/* Modal Form */}
             <ModalForm
                 isOpen={isModalOpen}
                 title={mode === "edit" ? "Edit Cabang" : "Tambah Cabang"}
@@ -442,13 +428,12 @@ function Cabang() {
                                 Nama Cabang
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">🏢</span></div>
                                 <input
                                     name="name"
                                     value={form.name}
                                     onChange={handleChange}
                                     placeholder="Masukkan nama cabang"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
@@ -458,14 +443,13 @@ function Cabang() {
                                 Alamat
                             </label>
                             <div className="relative">
-                                <div className="absolute top-3 left-3 pointer-events-none"><span className="text-gray-400">📍</span></div>
                                 <textarea
                                     name="address"
                                     value={form.address}
                                     onChange={handleChange}
                                     placeholder="Masukkan alamat lengkap"
                                     rows="3"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all resize-none placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all resize-none placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
@@ -475,13 +459,13 @@ function Cabang() {
                                 Nomor Telepon
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">📞</span></div>
+                                
                                 <input
                                     name="phone"
                                     value={form.phone}
                                     onChange={handleChange}
                                     placeholder="0821xxxxxxxx"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
@@ -491,45 +475,69 @@ function Cabang() {
                                 Status
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">⚡</span></div>
                                 <select
                                     name="status"
                                     value={form.status}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer"
                                 >
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                 </select>
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-gray-400">▼</span></div>
                             </div>
                         </div>
 
-                        <div className="space-y-3">
+                        {/* <div className="space-y-3">
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
                                 Jam Operasional
                             </label>
                             <div className="grid grid-cols-2 gap-3">
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">🌅</span></div>
                                     <input
                                         type="time"
                                         name="opening_time"
                                         value={form.opening_time}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all"
                                     />
                                 </div>
                                 <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">🌙</span></div>
                                     <input
                                         type="time"
                                         name="closing_time"
                                         value={form.closing_time}
                                         onChange={handleChange}
-                                        className="w-full pl-10 pr-3 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all"
                                     />
                                 </div>
+                            </div>
+                        </div> */}
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                    Opening Time
+                                </label>
+                                <input
+                                    type="time"
+                                    name="opening_time"
+                                    value={form.opening_time}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                    Closing Time
+                                </label>
+                                <input
+                                    type="time"
+                                    name="closing_time"
+                                    value={form.closing_time}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all"
+                                />
                             </div>
                         </div>
                     </div>

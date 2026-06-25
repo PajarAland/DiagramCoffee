@@ -7,6 +7,7 @@ function Riwayat() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeFilter, setActiveFilter] = useState("all");
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -24,16 +25,26 @@ function Riwayat() {
     }, []);
 
     const filteredOrders = useMemo(() => {
+        return orders.filter((order) => {
+            const matchStatus =
+                activeFilter === "all"
+                || order.status === activeFilter;
 
-        if (activeFilter === "all") {
-            return orders;
-        }
+            const matchSearch =
+                order.order_number
+                    ?.toLowerCase()
+                    .includes(
+                        search.toLowerCase()
+                    );
 
-        return orders.filter(
-            (order) => order.status === activeFilter
-        );
+            return (
+                matchStatus &&
+                matchSearch
+            );
 
-    }, [orders, activeFilter]);
+        });
+
+    }, [orders, activeFilter, search]);
 
     const getStatusConfig = (status) => {
         switch (status) {
@@ -58,13 +69,32 @@ function Riwayat() {
 
     return (
         <main className="max-w-7xl mx-auto px-4 py-8 md:px-8 space-y-10">
-            {/* HEADER */}
             <section className="mb-6">
                 <h1 className="text-3xl font-bold text-[#1E1E1E]">Riwayat Pesanan</h1>
                 <p className="mt-2 text-sm text-gray-500">Lihat semua pesanan kamu</p>
+                <section className="mb-4">
+                    <input
+                        type="text"
+                        placeholder="Cari pesanan..."
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(e.target.value)
+                        }
+                        className="
+                            w-full
+                            px-4
+                            py-3
+                            rounded-2xl
+                            border
+                            border-[#E5DED3]
+                            text-sm
+                            outline-none
+                            focus:border-[#2F5231]
+                        "
+                    />
+                </section>
             </section>
 
-            {/* FILTER */}
             <section className="flex gap-3 overflow-x-auto scrollbar-hide mb-6">
                 {filters.map((filter) => {
                     const active = activeFilter === filter.value;
@@ -80,7 +110,6 @@ function Riwayat() {
                 })}
             </section>
 
-            {/* CONTENT */}
             <section>
                 {loading ? (
                     <div className="grid gap-4">
@@ -90,7 +119,6 @@ function Riwayat() {
                     </div>
                 ) : filteredOrders.length === 0 ? (
                     <div className="bg-white rounded-3xl border border-[#ECE6DC] p-10 text-center">
-                        <div className="text-5xl mb-4">☕</div>
                         <h2 className="text-xl font-bold text-gray-800">Belum ada pesanan</h2>
                         <p className="text-sm text-gray-500 mt-2">Pesanan kamu akan muncul di sini</p>
                         <button onClick={() => navigate("/menu")} className="mt-6 px-6 py-3 rounded-2xl bg-[#2F5231] text-white text-sm font-semibold">Pesan Sekarang</button>
@@ -101,12 +129,22 @@ function Riwayat() {
                             const status = getStatusConfig(order.status);
                             return (
                                 <div key={order.id} className="bg-white rounded-3xl border border-[#ECE6DC] overflow-hidden">
-                                    {/* HEADER */}
                                     <div className="p-5 border-b border-[#F1ECE5]">
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                             <div>
                                                 <p className="text-xs text-gray-400">Order Number</p>
                                                 <h2 className="mt-1 text-lg font-bold text-gray-800">{order.order_number}</h2>
+                                                <p className="text-xs text-gray-400 mt-1">
+                                                    {new Date(order.created_at)
+                                                        .toLocaleString("id-ID", {
+                                                            day: "numeric",
+                                                            month: "long",
+                                                            year: "numeric",
+                                                            hour: "2-digit",
+                                                            minute: "2-digit",
+                                                        })
+                                                        .replace(" pukul", ", ")}
+                                                </p>
                                             </div>
                                             <div className="flex items-center gap-3 flex-wrap">
                                                 <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${status.className}`}>{status.label}</span>
@@ -115,7 +153,6 @@ function Riwayat() {
                                         </div>
                                     </div>
 
-                                    {/* ITEMS */}
                                     <div className="px-5 py-4 space-y-4">
                                         {order.items?.map((item) => (
                                             <div key={item.id} className="flex items-center justify-between">

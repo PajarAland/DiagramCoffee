@@ -152,7 +152,6 @@ function AdminCabang() {
 
     return (
         <main className="flex-1 p-6 overflow-auto">
-            {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                 <div>
                     <button
@@ -180,7 +179,6 @@ function AdminCabang() {
                 </button>
             </div>
 
-            {/* SEARCH */}
             <div className="mb-6">
                 <div className="relative max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -198,9 +196,7 @@ function AdminCabang() {
                 </div>
             </div>
 
-            {/* TABLE */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                {/* HEADER */}
                 <div className="hidden md:grid grid-cols-4 bg-[#EAE5D8] px-6 py-4 text-sm font-semibold text-[#2F5231]">
                     <div>Nama</div>
                     <div>Email</div>
@@ -208,7 +204,6 @@ function AdminCabang() {
                     <div className="text-center">Aksi</div>
                 </div>
 
-                {/* LOADING */}
                 {loading && (
                     <div className="p-12 text-center">
                         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-[#2F5231] border-t-transparent"></div>
@@ -216,10 +211,8 @@ function AdminCabang() {
                     </div>
                 )}
 
-                {/* BODY */}
                 {!loading && filtered.map((item) => (
                     <div key={item.id} className="block md:grid md:grid-cols-5 px-4 md:px-6 py-4 border-t border-gray-100 items-center gap-4 hover:bg-gray-50 transition-colors">
-                        {/* MOBILE */}
                         <div className="md:hidden space-y-2">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -254,7 +247,6 @@ function AdminCabang() {
                             </div>
                         </div>
 
-                        {/* DESKTOP */}
                         <div className="hidden md:block font-medium text-gray-800">
                             {item.name}
                         </div>
@@ -281,7 +273,6 @@ function AdminCabang() {
                     </div>
                 ))}
 
-                {/* EMPTY */}
                 {!loading && filtered.length === 0 && (
                     <div className="p-12 text-center">
 
@@ -297,14 +288,12 @@ function AdminCabang() {
                 )}
             </div>
 
-            {/* FOOTER */}
             {!loading && admins.length > 0 && (
                 <div className="mt-4 text-xs text-gray-400">
                     Menampilkan {filtered.length} dari {admins.length} admin
                 </div>
             )}
 
-            {/* MODAL */}
             <ModalForm
                 isOpen={isModalOpen}
                 title="Tambah Admin Cabang"
@@ -317,7 +306,6 @@ function AdminCabang() {
             >
                 {(handleChange) => (
                     <div className="space-y-4">
-                        {/* NAME */}
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Nama</label>
                             <input
@@ -329,7 +317,6 @@ function AdminCabang() {
                             />
                         </div>
 
-                        {/* EMAIL */}
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Email</label>
                             <input
@@ -342,7 +329,6 @@ function AdminCabang() {
                             />
                         </div>
 
-                        {/* PASSWORD */}
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Password</label>
                             <input
@@ -355,7 +341,6 @@ function AdminCabang() {
                             />
                         </div>
 
-                        {/* CONFIRM PASSWORD */}
                         <div>
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Konfirmasi Password</label>
                             <input

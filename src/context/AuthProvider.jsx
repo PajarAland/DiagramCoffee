@@ -30,7 +30,7 @@ export function AuthProvider({ children }) {
                     console.error("Auth check failed:", error);
                 }
 
-                // 🔥 kalau ternyata session invalid → clear flag
+                // kalau ternyata session invalid → clear flag
                 localStorage.removeItem("isLoggedIn");
                 sessionStorage.removeItem("isLoggedIn");
                 setUser(null);

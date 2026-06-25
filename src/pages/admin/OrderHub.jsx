@@ -1,4 +1,3 @@
-// truth
 import { useEffect, useMemo, useRef, useState } from "react";
 import API from "../../services/api";
 import Swal from "sweetalert2";
@@ -30,7 +29,6 @@ function OrderHub() {
             const res = await API.get("/api/admin/orders");
             const fetchedOrders = [...(res.data.data || [])].reverse();
 
-            // NOTIFICATION ORDER BARU
             if (lastOrderCount !== 0 && fetchedOrders.length > lastOrderCount) {
                 Swal.fire({
                     toast: true,
@@ -45,7 +43,6 @@ function OrderHub() {
             setLastOrderCount(fetchedOrders.length);
             setOrders(fetchedOrders);
 
-            // AUTO SELECT FIRST ORDER
             const isMobile = window.innerWidth < 1024;
             if (fetchedOrders.length > 0 && !selectedOrder && !userSelectedRef.current && !isMobile) {
                 const firstQueueOrder = fetchedOrders.find((order) =>
@@ -87,7 +84,6 @@ function OrderHub() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // SEARCH FILTER
     const filteredOrders = useMemo(() => {
         return orders.filter((order) =>
             order.order_number?.toLowerCase().includes(search.toLowerCase()) ||
@@ -95,17 +91,14 @@ function OrderHub() {
         );
     }, [orders, search]);
 
-    // WAITING PAYMENT
     const waitingPaymentOrders = filteredOrders.filter((order) =>
         order.payment_method === "cash" && order.payment_status === "unpaid" && order.status === "pending"
     );
 
-    // KITCHEN QUEUE
     const kitchenQueue = filteredOrders.filter((order) =>
         ["confirmed", "preparing", "ready"].includes(order.status)
     );
 
-    // COMPLETED
     const completedOrders = filteredOrders.filter((order) =>         
         ["completed", "cancelled"].includes(order.status)).slice(0, 10);             
         
@@ -287,14 +280,11 @@ function OrderHub() {
     return (
         <div className="w-full h-[calc(100dvh-32px)] md:h-[calc(100dvh-48px)] lg:h-[calc(100dvh-64px)] flex flex-col min-h-0 overflow-hidden">
             <div className="h-full grid grid-cols-1 lg:grid-cols-[420px_1fr] bg-white rounded-2xl md:rounded-3xl border border-gray-200/80 shadow-sm overflow-hidden flex-grow min-h-0">
-                {/* LEFT */}
                 <div className={`bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden ${selectedOrder ? "hidden lg:flex" : "flex"}`}>
-                    {/* HEADER */}
                     <div className="p-5 border-b">
                         <h1 className="text-2xl font-bold text-[#2F5231]">Kasir Dashboard</h1>
                         <p className="text-sm text-gray-500 mt-1">Monitoring pesanan cafe</p>
 
-                        {/* SEARCH */}
                         <div className="mt-4">
                             <input
                                 type="text"
@@ -305,7 +295,6 @@ function OrderHub() {
                             />
                         </div>
 
-                        {/* TABS */}
                         <div className="flex gap-2 mt-4 p-1 bg-gray-100 rounded-xl">
                             <button
                                 onClick={() => setActiveTab("active")}
@@ -336,7 +325,6 @@ function OrderHub() {
                         </div>
                     </div>
 
-                    {/* ORDER LIST */}
                     <div className="flex-1 overflow-y-auto min-h-0">
                         {loading && (
                             <div className="p-8 text-center">
@@ -344,7 +332,6 @@ function OrderHub() {
                             </div>
                         )}
 
-                        {/* WAITING PAYMENT */}
                         <div className={activeTab === "active" ? "" : "hidden"}>
                             {waitingPaymentOrders.length > 0 && (
                                 <div>
@@ -366,7 +353,6 @@ function OrderHub() {
                             )}
                         </div>
 
-                        {/* KITCHEN QUEUE */}
                         <div className={activeTab === "active" ? "" : "hidden"}>
                             <div className="px-4 py-3 bg-blue-50 text-blue-700 text-xs font-bold uppercase">Kitchen Queue</div>
                             {kitchenQueue.length > 0 ? (
@@ -380,7 +366,6 @@ function OrderHub() {
                             )}
                         </div>
 
-                        {/* COMPLETED */}
                         <div className={activeTab === "completed" ? "" : "hidden"}>
                             {completedOrders.length > 0 ? (
                                 <div>
@@ -396,21 +381,17 @@ function OrderHub() {
                     </div>
                 </div>
 
-                {/* RIGHT */}
                 <div className={`overflow-y-auto h-full bg-gray-50/30 min-h-0 ${selectedOrder ? "block" : "hidden lg:block"}`}>
                     {!selectedOrder ? (
                         <div className="h-full flex items-center justify-center">
                             <div className="text-center p-8">
-                                <div className="text-5xl mb-4 animate-pulse">☕</div>
                                 <p className="text-gray-500 text-sm font-medium">Pilih order</p>
                             </div>
                         </div>
                     ) : (
                         <div className="p-6">
-                            {/* HEADER */}
                             <div className="flex items-start justify-between gap-4 mb-6">
                                 <div className="flex items-center gap-3">
-                                    {/* Back Button for mobile */}
                                     <button
                                         onClick={() => {
                                             setSelectedOrder(null);
@@ -426,7 +407,6 @@ function OrderHub() {
                                 {renderActionButton()}
                             </div>
 
-                            {/* INFO */}
                             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                                 <div className="bg-white rounded-xl border p-4">
                                     <p className="text-xs text-gray-400">Status</p>
@@ -446,7 +426,6 @@ function OrderHub() {
                                 </div>
                             </div>
 
-                            {/* ITEMS */}
                             <div className="bg-white rounded-2xl border overflow-hidden">
                                 <div className="px-5 py-4 border-b font-bold text-gray-800">Detail Pesanan</div>
                                 <div className="divide-y">
@@ -461,7 +440,6 @@ function OrderHub() {
                                     ))}
                                 </div>
 
-                                {/* NOTES */}
                                 {selectedOrder.notes && (
                                     <div className="border-t px-5 py-4 bg-yellow-50">
                                         <p className="text-xs font-bold text-yellow-700 uppercase">Notes</p>

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import branchIcon from "../../assets/mdi--house-group-gold.svg";
 import arrowDownIcon from "../../assets/mdi--arrow-down.svg";
 import { useBranch } from "../../context/useBranch";
 
@@ -8,11 +7,7 @@ function BranchSelector() {
     const dropdownRef = useRef(null);
     const { branches, selectedBranch, changeBranch } = useBranch();
 
-    const selectedBranchData =
-        branches.find(
-            (branch) =>
-                branch.id === Number(selectedBranch)
-        );
+    const selectedBranchData = branches.find((branch) => branch.id === Number(selectedBranch)); 
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -30,10 +25,6 @@ function BranchSelector() {
                 onClick={() => setOpen((prev) => !prev)}
                 className="flex items-center gap-2 bg-white border border-[#E5DED3] rounded-xl px-3 py-2 shadow-sm min-w-[170px] max-w-[220px] transition-all hover:border-[#2F5231]/30"
             >
-                <div className="w-8 h-8 rounded-lg bg-[#2F5231]/10 flex items-center justify-center shrink-0">
-                    <img src={branchIcon} alt="branch" className="w-6 h-6" />
-                </div>
-
                 <div className="flex-1 text-left min-w-0">
                     <p className="text-[10px] text-gray-400 leading-none">Cabang</p>
                     <p className="text-sm font-medium text-gray-800 truncate">

@@ -6,7 +6,7 @@ import { useAuth } from "../../context/useAuth";
 
 function TitleBar() {
     const { user } = useAuth();
-    const [setShowCart] = useState(false);
+    const [showCartModal ,setShowCart] = useState(false);
     const showCart = !user || (user.role !== "admin" && user.role !== "super_admin");
     const showCabangSelector = !user || (user.role !== "admin" && user.role !== "super_admin");
 
@@ -45,7 +45,7 @@ function TitleBar() {
                 )}
             </header>
 
-            {showCart && (
+            {showCartModal && (
                 <ItemCart
                     onClose={() => setShowCart(false)}
                 />

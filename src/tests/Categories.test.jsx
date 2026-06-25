@@ -107,6 +107,38 @@ describe("Categories Page", () => {
         });
     });
 
+    test("hapus kategori memanggil API DELETE", async () => {
+
+        API.get.mockResolvedValueOnce({
+            data: {
+                data: [
+                    {
+                        id: 1,
+                        name: "Makanan",
+                        description: "desc",
+                        sort_order: 1,
+                    },
+                ],
+            },
+        });
+
+        API.delete = vi.fn().mockResolvedValueOnce({});
+
+        render(
+            <MemoryRouter>
+                <Categories />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText("Hapus")
+        );
+
+        await waitFor(() => {
+            expect(API.delete).toHaveBeenCalled();
+        });
+    });
+
     test("submit EDIT kategori → API PUT terpanggil", async () => {
         API.get.mockResolvedValueOnce({
             data: {

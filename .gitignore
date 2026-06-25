@@ -19,6 +19,9 @@ dist-ssr
 .vscode/*
 !.vscode/extensions.json
 .history/
+.scannerwork/
+coverage/
+sonar-project.properties
 .idea
 .DS_Store
 *.suo

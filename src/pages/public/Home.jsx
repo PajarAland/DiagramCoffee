@@ -53,13 +53,11 @@ function Home() {
 
     return (
         <div className="min-h-screen">
-            {/* HERO BANNER */}
             <section className="px-4 pt-4 md:px-8 max-w-4xl mx-auto">
                 <BannerCarousel />
             </section>
 
             <main className="max-w-7xl mx-auto px-4 py-8 md:px-8 space-y-10">
-                {/* LOADING */}
                 {loading && (
                     <div className="flex items-center justify-center py-12">
                         <div className="text-center">
@@ -74,7 +72,7 @@ function Home() {
                         {recommendations.popularity.length > 0 && (
                             <section className="space-y-4">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-800">🔥 Popular Right Now</h2>
+                                    <h2 className="text-2xl font-bold text-gray-800">Popular Right Now</h2>
                                     <p className="text-sm text-gray-500 mt-1">Menu paling populer di cabang ini</p>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -89,29 +87,11 @@ function Home() {
                             </section>
                         )}
 
-                        {recommendations.hybrid.length > 0 && (
-                            <section className="space-y-4">
-                                <div>
-                                    <h2 className="text-2xl font-bold text-gray-800">✨ Recommended For You</h2>
-                                    <p className="text-sm text-gray-500 mt-1">Rekomendasi personal berdasarkan aktivitasmu</p>
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                                    {recommendations.hybrid.map((item) => (
-                                        <MenuCard
-                                            key={item.id}
-                                            item={item}
-                                            onClick={(item) => navigate(`/productdetail/${item.id}`)}
-                                        />
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
                         {recommendations.ibcf.length > 0 && (
                             <section className="space-y-4">
                                 <div>
-                                    <h2 className="text-2xl font-bold text-gray-800">🧠 Similar Taste</h2>
-                                    <p className="text-sm text-gray-500 mt-1">Customer lain dengan selera mirip juga suka ini</p>
+                                    <h2 className="text-2xl font-bold text-gray-800">Recommended For You</h2>
+                                    <p className="text-sm text-gray-500 mt-1">Rekomendasi personal berdasarkan aktivitasmu</p>
                                 </div>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                                     {recommendations.ibcf.map((item) => (
@@ -125,7 +105,24 @@ function Home() {
                             </section>
                         )}
 
-                        {/* CATEGORY TABS */}
+                        {recommendations.hybrid.length > 0 && (
+                            <section className="space-y-4">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-800">Yours and others fav's</h2>
+                                    <p className="text-sm text-gray-500 mt-1">Favoritmu dan yang paling hits</p>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                    {recommendations.hybrid.map((item) => (
+                                        <MenuCard
+                                            key={item.id}
+                                            item={item}
+                                            onClick={(item) => navigate(`/productdetail/${item.id}`)}
+                                        />
+                                    ))}
+                                </div>
+                            </section>
+                        )}
+
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">
@@ -161,7 +158,6 @@ function Home() {
                             </div>
                         </section>
 
-                        {/* MENU ITEMS */}
                         <section className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <h2 className="text-xl md:text-2xl font-bold text-gray-800">{activeCategory}</h2>
@@ -180,7 +176,6 @@ function Home() {
                                 </div>
                             ) : (
                                 <div className="text-center py-12 bg-white rounded-xl">
-                                    <div className="text-4xl mb-2">🍽️</div>
                                     <p className="text-gray-400 text-sm">
                                         Tidak ada menu di kategori {activeCategory}
                                     </p>

@@ -138,7 +138,7 @@ function BannerManagement() {
             Swal.fire({
                 icon: "success",
                 title: "Berhasil",
-                text:"Banner berhasil dihapus",                
+                text:"Banner berhasil dihapus",
                 timer: 1200,
                 showConfirmButton: false,
             });
@@ -149,7 +149,7 @@ function BannerManagement() {
             Swal.fire({
                 icon: "error",
                 title: "Gagal",
-                text:"Gagal menghapus banner",                    
+                text:"Gagal menghapus banner",
             });
         }
     };
@@ -165,28 +165,38 @@ function BannerManagement() {
     }
 
     return (
-        <div className="min-h-screen p-6">
-            <div className="max-w-7xl mx-auto">
-                {/* HEADER */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <main className="flex-1 p-6 overflow-auto">
+            <div className="mb-8">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">
+                        <h1 className="text-2xl font-bold text-gray-800">
                             Banner Promo
                         </h1>
 
-                        <p className="text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 mt-1">
                             Kelola banner promo homepage
                         </p>
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="bg-[#2F5231] text-white px-5 py-3 rounded-xl font-semibold hover:bg-[#1e3a20] transition-all shadow-md"
+                        className="inline-flex items-center gap-2 bg-[#2F5231] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1e3a20] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
                     >
                         + Tambah Banner
                     </button>
                 </div>
 
-                {/* GRID */}
+                {banners.length === 0 && (
+                    <div className="bg-white border rounded-3xl p-10 text-center shadow-sm">
+                        <h2 className="text-xl font-bold text-gray-700">
+                            Banner tidak tersedia
+                        </h2>
+
+                        <p className="text-gray-500 mt-2">
+                            Tambahkan banner promo baru untuk ditampilkan di homepage
+                        </p>
+                    </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {banners.map((banner) => (
                         <div key={banner.id} className="bg-white rounded-3xl overflow-hidden shadow-md border">
@@ -199,7 +209,6 @@ function BannerManagement() {
                                         
                                 />
                             </div>
-                            {/* CONTENT */}
                             <div className="p-5">
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
@@ -225,7 +234,6 @@ function BannerManagement() {
                                         </span>
                                     </p>
                                 </div>
-                                {/* ACTION */}
                                 <div className="flex gap-3 mt-6">
                                     <button onClick={() => openEditModal(banner)} className="flex-1 py-2.5 rounded-xl border font-semibold hover:bg-gray-50 transition-all">Edit</button>
                                     <button onClick={() => handleDelete(banner)} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-60 transition-all">Hapus</button>
@@ -236,7 +244,6 @@ function BannerManagement() {
                 </div>
             </div>
 
-            {/* MODAL */}
             <ModalForm
                 isOpen={isModalOpen}
                 title={mode === "create" ? "Tambah Banner" : "Edit Banner"}
@@ -295,7 +302,7 @@ function BannerManagement() {
                     </div>
                 )}
             </ModalForm>
-        </div>
+        </main>
     );
 }
 

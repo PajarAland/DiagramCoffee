@@ -6,6 +6,8 @@ import API from "../services/api";
 
 const mockNavigate = vi.fn();
 
+
+
 vi.mock("react-router-dom", async () => {
 
     const actual =
@@ -26,25 +28,60 @@ vi.mock("../services/api", () => ({
 }));
 
 describe("Riwayat Page", () => {
+
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    test("renders loading state", () => {
-        API.get.mockImplementation(() => new Promise(() => { }));
+    test("menampilkan halaman riwayat", async () => {
+
+        API.get.mockResolvedValueOnce({
+            data: {
+                data: [],
+            },
+        });
+
         render(
             <MemoryRouter>
                 <Riwayat />
             </MemoryRouter>
         );
-        expect(document.querySelector(".animate-pulse")).toBeInTheDocument();
+
+        expect(
+            await screen.findByText(
+                /riwayat pesanan/i
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(
+                /lihat semua pesanan kamu/i
+            )
+        ).toBeInTheDocument();
+
     });
 
-    test("renders orders from API", async () => {
+    test("menampilkan riwayat orders dari API", async () => {
+
         API.get.mockResolvedValueOnce({
             data: {
                 data: [
-                    { id: 1, order_number: "ORD-001", status: "completed", payment_method: "cash", total_amount: 18000, items: [{ id: 1, menu_item_name: "Cappuccino", quantity: 2, subtotal: 18000 }] },
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "completed",
+                        payment_method: "cash",
+                        total_amount: 18000,
+                        items: [
+                            {
+                                id: 1,
+                                menu_item_name:
+                                    "Cappuccino",
+                                quantity: 2,
+                                subtotal: 18000,
+                            },
+                        ],
+                    },
                 ],
             },
         });
@@ -55,29 +92,41 @@ describe("Riwayat Page", () => {
             </MemoryRouter>
         );
 
-        expect(await screen.findByText("ORD-001")).toBeInTheDocument();
-        expect(screen.getByText(/cappuccino/i)).toBeInTheDocument();
-        expect((screen.getAllByText(/completed/i))[0]).toBeInTheDocument();
+        expect(
+            await screen.findByText(
+                "ORD-001"
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(
+                /cappuccino/i
+            )
+        ).toBeInTheDocument();
+
     });
 
-    test("renders empty state", async () => {
-        API.get.mockResolvedValueOnce({ data: { data: [] } });
-        render(
-            <MemoryRouter>
-                <Riwayat />
-            </MemoryRouter>
-        );
+    test("menampilkan detail riwayat order", async () => {
 
-        expect(await screen.findByText(/belum ada pesanan/i)).toBeInTheDocument();
-        expect(screen.getByText(/pesanan kamu akan muncul di sini/i)).toBeInTheDocument();
-    });
-
-    test("filter completed orders works", async () => {
         API.get.mockResolvedValueOnce({
             data: {
                 data: [
-                    { id: 1, order_number: "ORD-001", status: "completed", payment_method: "cash", total_amount: 18000, items: [] },
-                    { id: 2, order_number: "ORD-002", status: "pending", payment_method: "xendit", total_amount: 20000, items: [] },
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "completed",
+                        payment_method: "xendit",
+                        total_amount: 36000,
+                        items: [
+                            {
+                                id: 1,
+                                menu_item_name:
+                                    "Americano",
+                                quantity: 2,
+                                subtotal: 36000,
+                            },
+                        ],
+                    },
                 ],
             },
         });
@@ -88,29 +137,59 @@ describe("Riwayat Page", () => {
             </MemoryRouter>
         );
 
-        await screen.findByText("ORD-001");
-        fireEvent.click(screen.getAllByText(/completed/i)[0]);
-        expect(screen.getByText("ORD-001")).toBeInTheDocument();
-        expect(screen.queryByText("ORD-002")).not.toBeInTheDocument();
+        expect(
+            await screen.findByText(
+                "ORD-001"
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getAllByText(
+                /completed/i
+            ).length
+        ).toBeGreaterThan(0);
+
+        expect(
+            screen.getByText(
+                /xendit/i
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(
+                /americano/i
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getAllByText(
+                /rp 36\.000/i
+            ).length
+        ).toBeGreaterThan(0);
+
     });
 
-    test("navigate to menu from empty state", async () => {
-        API.get.mockResolvedValueOnce({ data: { data: [] } });
-        render(
-            <MemoryRouter>
-                <Riwayat />
-            </MemoryRouter>
-        );
+    test("memfilter tampilan order berdasarkan status", async () => {
 
-        fireEvent.click(await screen.findByText(/pesan sekarang/i));
-        expect(mockNavigate).toHaveBeenCalledWith("/menu");
-    });
-
-    test("navigate to order detail", async () => {
         API.get.mockResolvedValueOnce({
             data: {
                 data: [
-                    { id: 1, order_number: "ORD-001", status: "completed", payment_method: "cash", total_amount: 18000, items: [] },
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "completed",
+                        payment_method: "cash",
+                        total_amount: 18000,
+                        items: [],
+                    },
+                    {
+                        id: 2,
+                        order_number: "ORD-002",
+                        status: "pending",
+                        payment_method: "xendit",
+                        total_amount: 20000,
+                        items: [],
+                    },
                 ],
             },
         });
@@ -121,15 +200,51 @@ describe("Riwayat Page", () => {
             </MemoryRouter>
         );
 
-        fireEvent.click(await screen.findByText(/lihat detail/i));
-        expect(mockNavigate).toHaveBeenCalledWith("/orders/ORD-001");
+        await screen.findByText(
+            "ORD-001"
+        );
+
+        fireEvent.click(
+            screen.getAllByText(
+                /completed/i
+            )[0]
+        );
+
+        expect(
+            screen.getByText(
+                "ORD-001"
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.queryByText(
+                "ORD-002"
+            )
+        ).not.toBeInTheDocument();
+
     });
 
-    test("renders formatted currency", async () => {
+    test("filter pending menampilkan order pending", async () => {
+
         API.get.mockResolvedValueOnce({
             data: {
                 data: [
-                    { id: 1, order_number: "ORD-001", status: "completed", payment_method: "cash", total_amount: 18000, items: [{ id: 1, menu_item_name: "Cappuccino", quantity: 1, subtotal: 18000 }] },
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "pending",
+                        payment_method: "cash",
+                        total_amount: 18000,
+                        items: [],
+                    },
+                    {
+                        id: 2,
+                        order_number: "ORD-002",
+                        status: "completed",
+                        payment_method: "cash",
+                        total_amount: 20000,
+                        items: [],
+                    },
                 ],
             },
         });
@@ -140,14 +255,54 @@ describe("Riwayat Page", () => {
             </MemoryRouter>
         );
 
-        expect((await screen.findAllByText(/rp 18\.000/i)).length).toBeGreaterThan(0);
+        await screen.findByText(
+            "ORD-001"
+        );
+
+        fireEvent.click(
+            screen.getByRole(
+                "button",
+                {
+                    name: /pending/i,
+                }
+            )
+        );
+
+        expect(
+            screen.getByText(
+                "ORD-001"
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.queryByText(
+                "ORD-002"
+            )
+        ).not.toBeInTheDocument();
+
     });
 
-    test("renders payment method", async () => {
+    test("filter confirmed menampilkan order confirmed", async () => {
+
         API.get.mockResolvedValueOnce({
             data: {
                 data: [
-                    { id: 1, order_number: "ORD-001", status: "completed", payment_method: "xendit", total_amount: 18000, items: [] },
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "confirmed",
+                        payment_method: "cash",
+                        total_amount: 18000,
+                        items: [],
+                    },
+                    {
+                        id: 2,
+                        order_number: "ORD-002",
+                        status: "pending",
+                        payment_method: "cash",
+                        total_amount: 20000,
+                        items: [],
+                    },
                 ],
             },
         });
@@ -158,6 +313,239 @@ describe("Riwayat Page", () => {
             </MemoryRouter>
         );
 
-        expect(await screen.findByText(/xendit/i)).toBeInTheDocument();
+        await screen.findByText(
+            "ORD-001"
+        );
+
+        fireEvent.click(
+            screen.getByRole(
+                "button",
+                {
+                    name: /confirmed/i,
+                }
+            )
+        );
+
+        expect(
+            screen.getByText(
+                "ORD-001"
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.queryByText(
+                "ORD-002"
+            )
+        ).not.toBeInTheDocument();
+
     });
+
+    test("filter completed menampilkan order completed", async () => {
+
+        API.get.mockResolvedValueOnce({
+            data: {
+                data: [
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "completed",
+                        payment_method: "cash",
+                        total_amount: 18000,
+                        items: [],
+                    },
+                    {
+                        id: 2,
+                        order_number: "ORD-002",
+                        status: "pending",
+                        payment_method: "cash",
+                        total_amount: 20000,
+                        items: [],
+                    },
+                ],
+            },
+        });
+
+        render(
+            <MemoryRouter>
+                <Riwayat />
+            </MemoryRouter>
+        );
+
+        await screen.findByText(
+            "ORD-001"
+        );
+
+        fireEvent.click(
+            screen.getByRole(
+                "button",
+                {
+                    name: /completed/i,
+                }
+            )
+        );
+
+        expect(
+            screen.getByText(
+                "ORD-001"
+            )
+        ).toBeInTheDocument();
+
+        expect(
+            screen.queryByText(
+                "ORD-002"
+            )
+        ).not.toBeInTheDocument();
+
+    });
+
+    test("lihat detail mengarah ke halaman order status", async () => {
+
+        API.get.mockResolvedValueOnce({
+            data: {
+                data: [
+                    {
+                        id: 1,
+                        order_number: "ORD-001",
+                        status: "completed",
+                        payment_method: "cash",
+                        total_amount: 18000,
+                        items: [],
+                    },
+                ],
+            },
+        });
+
+        render(
+            <MemoryRouter>
+                <Riwayat />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText(
+                /lihat detail/i
+            )
+        );
+
+        expect(mockNavigate)
+            .toHaveBeenCalledWith(
+                "/orders/ORD-001"
+            );
+
+    });
+
+    test("menampilkan loading state saat data riwayat dimuat", () => {
+
+    API.get.mockImplementation(
+        () => new Promise(() => {})
+    );
+
+    render(
+        <MemoryRouter>
+            <Riwayat />
+        </MemoryRouter>
+    );
+
+    expect(
+        document.querySelector(
+            ".animate-pulse"
+        )
+    ).toBeInTheDocument();
+
+});
+
+test("menampilkan tanggal dan waktu pembelian", async () => {
+
+    API.get.mockResolvedValueOnce({
+        data: {
+            data: [
+                {
+                    id: 1,
+                    order_number: "ORD-001",
+                    created_at: "2026-05-23T17:14:00",
+                    status: "completed",
+                    payment_method: "cash",
+                    total_amount: 18000,
+                    items: [],
+                },
+            ],
+        },
+    });
+
+    render(
+        <MemoryRouter>
+            <Riwayat />
+        </MemoryRouter>
+    );
+
+    expect(
+    await screen.findByText(
+        /23 mei 2026,\s+17\.14/i
+    )
+).toBeInTheDocument();
+
+});
+
+test("mencari order berdasarkan nomor pesanan", async () => {
+
+    API.get.mockResolvedValueOnce({
+        data: {
+            data: [
+                {
+                    id: 1,
+                    order_number: "ORD-001",
+                    status: "completed",
+                    payment_method: "cash",
+                    total_amount: 18000,
+                    items: [],
+                },
+                {
+                    id: 2,
+                    order_number: "ORD-002",
+                    status: "pending",
+                    payment_method: "cash",
+                    total_amount: 20000,
+                    items: [],
+                },
+            ],
+        },
+    });
+
+    render(
+        <MemoryRouter>
+            <Riwayat />
+        </MemoryRouter>
+    );
+
+    await screen.findByText(
+        "ORD-001"
+    );
+
+    fireEvent.change(
+        screen.getByPlaceholderText(
+            /cari pesanan/i
+        ),
+        {
+            target: {
+                value: "ORD-001",
+            },
+        }
+    );
+
+    expect(
+        screen.getByText(
+            "ORD-001"
+        )
+    ).toBeInTheDocument();
+
+    expect(
+        screen.queryByText(
+            "ORD-002"
+        )
+    ).not.toBeInTheDocument();
+
+});
+
+
+
 });

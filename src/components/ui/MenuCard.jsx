@@ -30,14 +30,24 @@ function MenuCard({ item, onClick }) {
     const discountAmount = Number(item.discount_amount);
     const finalPrice = Number(item.final_price || item.base_price);
 
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClick?.(item);
+        }
+    };
+
     return (
         <div
             onClick={() => onClick?.(item)}
+            onKeyDown={handleKeyDown}
+            role="button"
+            tabIndex={0}
+            aria-label={`Menu ${item.name || ''}, Harga ${formatPrice(finalPrice)}`}
             className="group bg-white rounded-xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg hover:scale-[1.02] hover:border-[#2F5231]/20 transition-all duration-300 cursor-pointer w-full h-full flex flex-col"
         >
-            {/* Image Container */}
             <div className="relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
-                {!imageError ? (
+                {!imageError && item.image_url ? (
                     <img
                         src={`${baseImageUrl}${item.image_url}`}
                         alt={item.name || "Menu item"}
@@ -50,8 +60,7 @@ function MenuCard({ item, onClick }) {
                         <img src={imagePlaceholder} alt="Placeholder" className="w-12 h-12 object-contain opacity-50" />
                     </div>
                 )}
-                
-                {/* Badge - Optional */}
+
                 {item.is_popular && (
                     <div className="absolute top-2 left-2 bg-[#2F5231] text-white text-xs font-medium px-2 py-0.5 rounded-full shadow-md">
                         Populer
@@ -59,21 +68,17 @@ function MenuCard({ item, onClick }) {
                 )}
             </div>
 
-            {/* Content Container */}
             <div className="p-3 flex-1 flex flex-col">
-                {/* Title */}
                 <h3 className="text-sm font-semibold text-gray-800 line-clamp-2 min-h-[2.5rem] group-hover:text-[#2F5231] transition-colors duration-200">
                     {truncateText(item.name, 35)}
                 </h3>
 
-                {/* Description - Optional */}
                 {item.description && (
                     <p className="text-xs text-gray-400 mt-1 line-clamp-2 min-h-[2rem]">
                         {truncateText(item.description, 40)}
                     </p>
                 )}
 
-                {/* Price Section */}
                 <div className="mt-3 pt-2 border-t border-gray-100">
                     <div className="flex items-end justify-between gap-2">
                         <div>

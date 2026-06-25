@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import API from "../../services/api";
+import Swal from "sweetalert2";
 import cardClockIcon from "../../assets/mdi--credit-card-clock-outline.svg"; 
 import coffeeMakerIcon from "../../assets/mdi--coffee-maker-check.svg"; 
 import checkMarkIcon from "../../assets/mdi--check-circle.svg"; 
@@ -22,7 +23,6 @@ function OrderStatus() {
             try {
                 const res = await API.get(`/api/orders/status/${orderNumber}`);
                 setOrder(res.data.data);
-                console.log(res.data.data);
             } catch (err) {
                 console.error(err);
                 setError(
@@ -167,7 +167,6 @@ function OrderStatus() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 px-4">
                 <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center transform transition-all duration-300 hover:scale-105">
-                    <div className="text-7xl mb-4 animate-bounce">⚠️</div>
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">
                         Terjadi Kesalahan
                     </h1>
@@ -187,21 +186,47 @@ function OrderStatus() {
     const progressSteps = getProgressSteps();
 
     const handleCancelOrder = async () => {
+        const result = await Swal.fire({
+            title: "Batalkan Pesanan?",
+            text: "Pesanan yang dibatalkan tidak dapat dikembalikan",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Ya, Batalkan",
+            cancelButtonText: "Batal",
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#6b7280",
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             await API.post(`/api/orders/${order.id}/cancel`);
+
+            await Swal.fire({
+                title: "Berhasil",
+                text: "Pesanan berhasil dibatalkan",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+            });
+
             window.location.reload();
         } catch (err) {
             console.error(err);
-            alert(err?.response?.data?.message || "Gagal membatalkan pesanan");
+            Swal.fire({
+                title: "Gagal",
+                text:
+                    err?.response?.data?.message
+                    || "Gagal membatalkan pesanan",
+                icon: "error",
+            });
         }
     };
 
     return (
         <div className="min-h-screen bg-[#F7F3EF] py-8 px-4">
             <div className="max-w-4xl mx-auto">
-                {/* STATUS CARD */}
                 <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden transform transition-all duration-300 hover:shadow-2xl">
-                    {/* HEADER */}
                     <div className={`${statusConfig.bg} p-8 text-center relative overflow-hidden`}>
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-16 -mt-16"></div>
                         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white opacity-10 rounded-full -ml-12 -mb-12"></div>
@@ -220,13 +245,11 @@ function OrderStatus() {
 
                         {redirectStatus === "success" && (
                             <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-full text-xs font-semibold shadow-md">
-                                <span>✓</span>
                                 Pembayaran berhasil diverifikasi
                             </div>
                         )}
                     </div>
 
-                    {/* PROGRESS BAR for active orders */}
                     {order.status !== "cancelled" && order.status !== "completed" && (
                         <div className="px-8 pt-8 pb-4 border-b border-gray-100">
                             <div className="relative">
@@ -238,10 +261,10 @@ function OrderStatus() {
                                                     w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg
                                                     transition-all duration-300 transform hover:scale-110
                                                     ${step.isCompleted ? 'bg-green-500 text-white shadow-lg' : 
-                                                      step.isCurrent ? 'bg-[#2F5231] text-white shadow-lg ring-4 ring-[#2F5231] ring-opacity-30' : 
-                                                      'bg-gray-200 text-gray-400'}
+                                                        step.isCurrent ? 'bg-[#2F5231] text-white shadow-lg ring-4 ring-[#2F5231] ring-opacity-30' : 
+                                                        'bg-gray-200 text-gray-400'}
                                                 `}>
-                                                    {step.isCompleted ? ("✓") : (<img src={step.icon} alt={step.label} className="w-5 h-5 object-contain"/>)}
+                                                    {step.isCompleted ? ("yes") : (<img src={step.icon} alt={step.label} className="w-5 h-5 object-contain"/>)}
                                                 </div>
                                                 <p className="text-xs font-medium mt-2 text-gray-600 hidden sm:block">
                                                     {step.label}
@@ -260,9 +283,7 @@ function OrderStatus() {
                         </div>
                     )}
 
-                    {/* CONTENT */}
                     <div className="p-8">
-                        {/* ORDER INFO */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                             <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200">
                                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -308,7 +329,6 @@ function OrderStatus() {
                             </div>
                         </div>
 
-                        {/* ITEMS */}
                         <div className="mb-6">
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-xl font-bold text-gray-800">
@@ -350,11 +370,9 @@ function OrderStatus() {
                             </div>
                         </div>
 
-                        {/* NOTES */}
                         {order.notes && (
                             <div className="mb-6 bg-amber-50 border-l-4 border-amber-400 rounded-r-2xl p-5 shadow-sm">
                                 <div className="flex items-start gap-3">
-                                    <div className="text-xl">📝</div>
                                     <div className="flex-1">
                                         <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">
                                             Catatan
@@ -367,7 +385,6 @@ function OrderStatus() {
                             </div>
                         )}
 
-                        {/* ACTION BUTTON */}
                         <div className="flex gap-3 flex-wrap">
                             <button
                                 onClick={() => navigate("/home")}
@@ -435,7 +452,6 @@ function OrderStatus() {
                             )}
                         </div>
 
-                        {/* TIMESTAMP */}
                         <div className="
                             mt-6
                             pt-4
@@ -491,9 +507,7 @@ function OrderStatus() {
                                 ">
                                     {order.branch?.name || "-"}
                                 </p>
-
                             </div>
-
                         </div>
                     </div>
                 </div>

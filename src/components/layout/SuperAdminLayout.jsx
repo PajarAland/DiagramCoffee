@@ -31,7 +31,7 @@ function SuperAdminLayout() {
             {isMobile && (
                 <button
                     onClick={toggleSidebar}
-                    className="fixed top-0 z-30 m-3 p-1 bg-[#2F5231] text-white rounded-lg shadow-lg hover:bg-[#1e3820] transition-all active:scale-95"
+                    className="fixed top-0 z-30 m-3 p-2 bg-[#2F5231] text-white rounded-lg shadow-lg hover:bg-[#1e3820] transition-all active:scale-95"
                     aria-label="Toggle menu"
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

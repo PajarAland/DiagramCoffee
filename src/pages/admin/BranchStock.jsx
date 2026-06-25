@@ -119,7 +119,6 @@ function BranchStock() {
 
     return (
         <main className="flex-1 p-6 overflow-auto">
-            {/* HEADER */}
             <div className="mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
@@ -146,7 +145,6 @@ function BranchStock() {
                 </div>
             </div>
 
-            {/* SEARCH */}
             <div className="mb-6">
                 <div className="relative max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -164,9 +162,7 @@ function BranchStock() {
                 </div>
             </div>
 
-            {/* TABLE */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                {/* HEADER */}
                 <div className="hidden md:grid grid-cols-7 bg-[#EAE5D8] px-6 py-4 text-sm font-semibold text-[#2F5231] gap-4">
                     <div>Menu</div>
                     <div>Harga</div>
@@ -177,7 +173,6 @@ function BranchStock() {
                     <div>Aksi</div>
                 </div>
 
-                {/* LOADING */}
                 {loading && (
                     <div className="p-12 text-center">
                         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-[#2F5231] border-t-transparent"></div>
@@ -185,21 +180,17 @@ function BranchStock() {
                     </div>
                 )}
 
-                {/* BODY */}
                 {!loading && filtered.map((item, index) => (
                     <div key={item.id} className="grid md:grid-cols-7 gap-4 px-6 py-4 border-t items-center">
-                        {/* MENU */}
                         <div>
                             <p className="font-semibold text-gray-800">{item.menu_item?.name}</p>
                             <p className="text-xs text-gray-500 mt-1">{item.menu_item?.category?.name}</p>
                         </div>
 
-                        {/* PRICE */}
                         <div className="text-sm text-gray-600">
                             Rp {Number(item.menu_item?.base_price).toLocaleString("id-ID")}
                         </div>
 
-                        {/* STOCK */}
                         <div>
                             <input
                                 type="number"
@@ -210,7 +201,6 @@ function BranchStock() {
                             />
                         </div>
 
-                        {/* STATUS */}
                         <div>
                             <select
                                 value={item.is_available ? "1" : "0"}
@@ -222,7 +212,6 @@ function BranchStock() {
                             </select>
                         </div>
 
-                        {/* DISCOUNT TYPE */}
                         <div>
                             <select
                                 value={item.discount_type || ""}
@@ -235,7 +224,6 @@ function BranchStock() {
                             </select>
                         </div>
 
-                        {/* DISCOUNT VALUE */}
                         <div>
                             <input
                                 type="number"
@@ -256,7 +244,6 @@ function BranchStock() {
                             />
                         </div>
 
-                        {/* ACTION */}
                         <div>
                             <button
                                 onClick={() => handleUpdate(item)}
@@ -268,10 +255,8 @@ function BranchStock() {
                     </div>
                 ))}
 
-                {/* EMPTY */}
                 {!loading && filtered.length === 0 && (
                     <div className="p-12 text-center">
-                        <div className="text-4xl mb-3">🍽️</div>
                         <p className="text-gray-500 text-sm">Menu tidak ditemukan</p>
                     </div>
                 )}

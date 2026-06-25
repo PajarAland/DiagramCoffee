@@ -105,7 +105,6 @@ function ProductDetail() {
         const totalQty =
             existingQty + qty;
 
-        // VALIDATE BEFORE MUTATION
         if (
             item.stock != null &&
             totalQty > item.stock
@@ -118,7 +117,6 @@ function ProductDetail() {
             return;
         }
 
-        // 🔥 SAFE UPDATE
         if (existingItemIndex !== -1) {
 
             existingCart[
@@ -169,7 +167,6 @@ function ProductDetail() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-6xl mb-4">🍽️</div>
                     <p className="text-gray-500 text-lg">Menu tidak ditemukan di cabang ini</p>
                     <button
                         onClick={() => navigate("/menu")}
@@ -189,21 +186,16 @@ function ProductDetail() {
 
     return (
         <>
-            {/* Toast Alert */}
             {showAlert && (
                 <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slide-down">
                     <div className="bg-[#2F5231] text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2">
-                        <span>✓</span>
                         <span>Berhasil ditambahkan ke keranjang!</span>
                     </div>
                 </div>
             )}
-
-            {/* <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen"> */}
                 <div className="px-4 py-8 md:px-8 md:py-12">
                     <div className="max-w-7xl mx-auto md:grid md:grid-cols-2 md:gap-12 lg:gap-16 items-start">
 
-                        {/* IMAGE SECTION */}
                         <div className="relative group">
                             <div className="overflow-hidden rounded-2xl shadow-xl bg-gray-100">
                                 {!imageError ? (
@@ -254,10 +246,7 @@ function ProductDetail() {
                             </div>
                         </div>
 
-                        {/* CONTENT SECTION */}
                         <div className="pt-8 md:pt-0 space-y-8">
-
-                            {/* TITLE & DESCRIPTION */}
                             <div className="space-y-4">
                                 <div>
                                     <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mt-2 leading-tight">
@@ -283,9 +272,8 @@ function ProductDetail() {
                                 </div>
                             </div>
 
-                            {/* QUANTITY SELECTOR */}
                             <div className="space-y-4">
-                                <label className="text-sm font-medium text-gray-700">Jumlah Pesanan</label>
+                                <p className="text-sm font-medium text-gray-700">Jumlah Pesanan</p>
                                 <div className="flex items-center gap-4">
                                     <button
                                         onClick={decreaseQty}
@@ -335,7 +323,6 @@ function ProductDetail() {
                                 </div>
                             </div>
 
-                            {/* PRICE SUMMARY */}
                             <div className="bg-gray-50 rounded-xl p-4 space-y-2">
                                 <div className="flex justify-between text-gray-600">
                                     <span>Harga ({qty} item)</span>
@@ -349,7 +336,6 @@ function ProductDetail() {
                                 </div>
                             </div>
 
-                            {/* ADD TO CART BUTTON */}
                             <button
                                 onClick={handleAddToCart}
                                 className="
@@ -374,7 +360,6 @@ function ProductDetail() {
                     </div>
                 </div>
 
-                {/* RECOMMENDATION SECTION */}
                 <div className="bg-gray-50 mt-8">
                     <div className="px-4 py-12 md:px-8 max-w-7xl mx-auto">
                         <div className="text-center mb-10">
@@ -412,23 +397,6 @@ function ProductDetail() {
                         )}
                     </div>
                 </div>
-            {/* </div> */}
-
-            {/* <style jsx>{`
-                @keyframes slideDown {
-                    from {
-                        opacity: 0;
-                        transform: translate(-50%, -100%);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translate(-50%, 0);
-                    }
-                }
-                .animate-slide-down {
-                    animation: slideDown 0.3s ease-out;
-                }
-            `}</style> */}
         </>
     );
 }

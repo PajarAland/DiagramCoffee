@@ -61,187 +61,438 @@ vi.mock("../components/ui/ModalForm.jsx", () => ({
 }));
 
 describe("ItemMenu Page", () => {
+
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    describe("Loading State", () => {
-        test("menampilkan loading", () => {
-            API.get.mockImplementation(() => new Promise(() => { }));
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            expect(screen.getByText(/loading menu items/i)).toBeInTheDocument();
-        });
-    });
+    test("menampilkan halaman ItemMenu", async () => {
 
-    describe("Data Rendering", () => {
-        test("menampilkan data menu", async () => {
-            API.get.mockResolvedValueOnce({
-                data: { data: [{ id: 1, name: "Americano", base_price: 20000, category: { name: "Coffee" } }] },
-            }).mockResolvedValueOnce({
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
                 data: { data: [] },
             });
 
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            expect(await screen.findByText("Americano")).toBeInTheDocument();
-            expect(screen.getByText("Coffee")).toBeInTheDocument();
-            expect(screen.getByText(/rp20000/i)).toBeInTheDocument();
-        });
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
 
-        test("empty state muncul", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            expect(await screen.findByText(/menu tidak ditemukan/i)).toBeInTheDocument();
-        });
+        expect(
+            await screen.findByText(/manajemen menu/i)
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByPlaceholderText(/cari menu/i)
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(/tambah menu/i)
+        ).toBeInTheDocument();
+
     });
 
-    describe("Search Feature", () => {
-        test("search filter bekerja", async () => {
-            API.get.mockResolvedValueOnce({
+    test("menampilkan data menu", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
                 data: {
                     data: [
-                        { id: 1, name: "Americano", base_price: 20000, category: { name: "Coffee" } },
-                        { id: 2, name: "Matcha Latte", base_price: 25000, category: { name: "Non Coffee" } },
+                        {
+                            id: 1,
+                            name: "Americano",
+                            base_price: 20000,
+                            category: {
+                                name: "Coffee",
+                            },
+                        },
                     ],
                 },
-            }).mockResolvedValueOnce({
+            })
+            .mockResolvedValueOnce({
                 data: { data: [] },
             });
 
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            await screen.findByText("Americano");
-            const input = screen.getByPlaceholderText(/cari menu/i);
-            fireEvent.change(input, { target: { value: "matcha" } });
-            expect(screen.getByText("Matcha Latte")).toBeInTheDocument();
-            expect(screen.queryByText("Americano")).not.toBeInTheDocument();
-        });
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        expect(
+            await screen.findByText("Americano")
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText("Coffee")
+        ).toBeInTheDocument();
+
+        expect(
+            screen.getByText(/rp20000/i)
+        ).toBeInTheDocument();
+
     });
 
-    describe("Add Menu Flow", () => {
-        test("klik tambah menu membuka modal", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({
-                data: { data: [{ id: 1, name: "Coffee" }] },
-            });
+    test("modal add menu tersedia", async () => {
 
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            fireEvent.click(await screen.findByText(/tambah menu/i));
-            expect(screen.getAllByText(/tambah menu/i)[1]).toBeInTheDocument();
+    API.get
+        .mockResolvedValueOnce({
+            data: { data: [] },
+        })
+        .mockResolvedValueOnce({
+            data: {
+                data: [
+                    {
+                        id: 1,
+                        name: "Coffee",
+                    },
+                ],
+            },
         });
 
-        test("submit add memanggil API POST", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({
-                data: { data: [{ id: 1, name: "Coffee" }] },
-            });
-            API.post.mockResolvedValue({ data: { success: true } });
-            Swal.fire.mockResolvedValue({ isConfirmed: true });
-
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-
-            fireEvent.click(
-                await screen.findByText(
-                    /tambah menu/i
-                )
-            );
-
-            fireEvent.click(
-                screen.getByText(
-                    /simpan/i
-                )
-            );
-
-            await waitFor(() => { expect(API.post).toHaveBeenCalled(); });
-            expect(Swal.fire).toHaveBeenCalled();
-        }
-        );
-    }
+    render(
+        <MemoryRouter>
+            <ItemMenu />
+        </MemoryRouter>
     );
 
-    // =====================================
-    // CANCEL FLOW
-    // =====================================
+    await screen.findByText(/tambah menu/i);
 
-    describe("Cancel Flow", () => {
-        test("cancel modal menutup modal", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            fireEvent.click(await screen.findByText(/tambah menu/i));
-            fireEvent.click(screen.getByText(/batal/i));
-            await waitFor(() => {
-                expect(screen.queryByRole("heading", { name: /tambah menu/i })).not.toBeInTheDocument();
+    expect(
+        screen.queryByRole("heading", {
+            name: /tambah menu/i,
+        })
+    ).not.toBeInTheDocument();
+
+});
+
+    test("klik tambah menu membuka modal", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    data: [
+                        {
+                            id: 1,
+                            name: "Coffee",
+                        },
+                    ],
+                },
             });
-        });
 
-        test("dirty form memunculkan confirm", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            fireEvent.click(await screen.findByText(/tambah menu/i));
-            expect(screen.getByRole("heading", { name: /tambah menu/i })).toBeInTheDocument();
-        });
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText(/tambah menu/i)
+        );
+
+        expect(
+            screen.getAllByText(/tambah menu/i)[1]
+        ).toBeInTheDocument();
+
     });
 
-    describe("Error Handling", () => {
-        test("jika API gagal tampil swal error", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
-            API.post.mockRejectedValue(new Error("Server Error"));
-            Swal.fire.mockResolvedValueOnce({ isConfirmed: true }).mockResolvedValueOnce({});
+    test("submit add menu memanggil API POST", async () => {
 
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            fireEvent.click(await screen.findByText(/tambah menu/i));
-            fireEvent.click(screen.getByText(/simpan/i));
-            await waitFor(() => {
-                expect(Swal.fire).toHaveBeenCalledWith(expect.objectContaining({ icon: "error" }));
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
+                data: {
+                    data: [
+                        {
+                            id: 1,
+                            name: "Coffee",
+                        },
+                    ],
+                },
             });
+
+        API.post.mockResolvedValue({
+            data: {
+                success: true,
+            },
+        });
+
+        API.get.mockResolvedValueOnce({
+    data: {
+        data: [],
+    },
+});
+
+        Swal.fire.mockResolvedValue({
+            isConfirmed: true,
+        });
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText(/tambah menu/i)
+        );
+
+        fireEvent.click(
+            screen.getByText(/simpan/i)
+        );
+
+        await waitFor(() => {
+
+            expect(API.post)
+                .toHaveBeenCalled();
+
+        });
+
+        expect(Swal.fire)
+            .toHaveBeenCalled();
+
+    });
+
+    test("dirty form memunculkan confirm", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            });
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText(/tambah menu/i)
+        );
+
+        expect(
+            screen.getByRole("heading", {
+                name: /tambah menu/i,
+            })
+        ).toBeInTheDocument();
+
+    });
+
+    test("cancel modal menutup modal", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            });
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText(/tambah menu/i)
+        );
+
+        fireEvent.click(
+            screen.getByText(/batal/i)
+        );
+
+        await waitFor(() => {
+
+            expect(
+                screen.queryByRole("heading", {
+                    name: /tambah menu/i,
+                })
+            ).not.toBeInTheDocument();
+
+        });
+
+    });
+
+    test("jika API gagal tampil swal error", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            });
+
+        API.post.mockRejectedValue(
+            new Error("Server Error")
+        );
+
+        Swal.fire
+            .mockResolvedValueOnce({
+                isConfirmed: true,
+            })
+            .mockResolvedValueOnce({});
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        fireEvent.click(
+            await screen.findByText(/tambah menu/i)
+        );
+
+        fireEvent.click(
+            screen.getByText(/simpan/i)
+        );
+
+        const file =
+            new File(
+                ["menu"],
+                "menu.png",
+                {
+                    type: "image/png",
+                }
+            );
+
+        const input =
+            document.querySelector(
+                'input[type="file"]'
+            );
+
+        fireEvent.change(input, {
+            target: {
+                files: [file],
+            },
+        });
+
+        expect(
+            screen.getByText(
+                /gambar siap diupload/i
+            )
+        ).toBeInTheDocument();
+
+        await waitFor(() => {
+
+            expect(Swal.fire)
+                .toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        icon: "error",
+                    })
+                );
         });
     });
 
-    describe("Upload Feature", () => {
-        test("user dapat upload gambar", async () => {
-            API.get.mockResolvedValueOnce({ data: { data: [] } }).mockResolvedValueOnce({ data: { data: [] } });
-            render(
-                <MemoryRouter>
-                    <ItemMenu />
-                </MemoryRouter>
-            );
-            fireEvent.click(await screen.findByText(/tambah menu/i));
-            const file = new File(["dummy"], "coffee.png", { type: "image/png" });
-            const input = document.querySelector('input[type="file"]');
-            fireEvent.change(input, { target: { files: [file] } });
-            expect(input.files[0].name).toBe("coffee.png");
-        });
+    test("loading state ditampilkan", () => {
+
+        API.get.mockImplementation(
+            () => new Promise(() => {})
+        );
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        expect(
+            screen.getByText(
+                /loading menu items/i
+            )
+        ).toBeInTheDocument();
+
     });
+
+    test("menampilkan empty state", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            })
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            });
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        expect(
+            await screen.findByText(/menu tidak ditemukan/i)
+        ).toBeInTheDocument();
+
+    });
+
+    test("search filter bekerja", async () => {
+
+        API.get
+            .mockResolvedValueOnce({
+                data: {
+                    data: [
+                        {
+                            id: 1,
+                            name: "Americano",
+                            base_price: 20000,
+                            category: {
+                                name: "Coffee",
+                            },
+                        },
+                        {
+                            id: 2,
+                            name: "Matcha Latte",
+                            base_price: 25000,
+                            category: {
+                                name: "Non Coffee",
+                            },
+                        },
+                    ],
+                },
+            })
+            .mockResolvedValueOnce({
+                data: { data: [] },
+            });
+
+        render(
+            <MemoryRouter>
+                <ItemMenu />
+            </MemoryRouter>
+        );
+
+        await screen.findByText("Americano");
+
+        const input =
+            screen.getByPlaceholderText(/cari menu/i);
+
+        fireEvent.change(input, {
+            target: {
+                value: "matcha",
+            },
+        });
+
+        expect(
+            screen.getByText("Matcha Latte")
+        ).toBeInTheDocument();
+
+        expect(
+            screen.queryByText("Americano")
+        ).not.toBeInTheDocument();
+
+    });
+
 });

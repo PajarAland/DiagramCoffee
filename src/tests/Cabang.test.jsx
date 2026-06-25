@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 /* eslint-env vitest */
 
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Cabang from "../pages/super_admin/Cabang";
 import API from "../services/api";
@@ -44,16 +44,24 @@ describe("Cabang Page", () => {
         vi.restoreAllMocks();
     });
 
-    test("menampilkan loading saat pertama render", () => {
-        API.get.mockResolvedValue({ data: { data: [] } });
-        
+    test("menampilkan loading saat pertama render", async () => {
+
+        API.get.mockResolvedValue({
+            data: { data: [] },
+        });
+
         render(
             <MemoryRouter>
                 <Cabang />
             </MemoryRouter>
         );
 
-        expect(screen.getByText(/loading/i)).toBeInTheDocument();
+        await waitFor(() => {
+
+            expect(
+                screen.getByText(/loading/i)
+            ).toBeInTheDocument();
+        });
     });
 
     test("menampilkan data cabang dari API", async () => {
@@ -147,6 +155,53 @@ describe("Cabang Page", () => {
         });
     });
 
+    test("hapus cabang memanggil API DELETE", async () => {
+
+        API.get.mockResolvedValue({
+            data: {
+                data: [
+                    {
+                        id: 1,
+                        name: "Dago",
+                        address: "Jl. Dago",
+                        phone: "08123",
+                        status: "active",
+                        opening_time: "08:00",
+                        closing_time: "22:00",
+                    },
+                ],
+            },
+        });
+
+        API.delete = vi.fn().mockResolvedValue({
+            data: {
+                message: "Cabang berhasil dihapus",
+            },
+        });
+
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+
+            expect(
+                screen.getAllByText("Dago")[0]
+            ).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getAllByText(/hapus/i)[0]
+        );
+
+        await waitFor(() => {
+
+            expect(API.delete).toHaveBeenCalled();
+        });
+    });
+
     test("membuka modal edit dengan data terisi", async () => {
         API.get.mockResolvedValue({
             data: {
@@ -183,9 +238,34 @@ describe("Cabang Page", () => {
     });
 
     test("membuka modal tambah cabang", async () => {
-
         API.get.mockResolvedValue({
             data: { data: [] },
+        });
+
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
+
+        await act(async () => {
+            fireEvent.click(
+                screen.getByText(/tambah cabang/i)
+            );
+        });
+        screen.getByRole("heading", { name: /tambah cabang/i });
+        expect(screen.getByPlaceholderText(/masukkan nama cabang/i)).toBeInTheDocument();
+    });
+
+    test("submit tambah cabang memanggil API POST", async () => {
+        API.get.mockResolvedValue({
+            data: { data: [] },
+        });
+
+        API.post.mockResolvedValue({
+            data: {
+                message: "Cabang berhasil ditambahkan",
+            },
         });
 
         render(
@@ -198,7 +278,109 @@ describe("Cabang Page", () => {
             screen.getByText(/tambah cabang/i)
         );
 
-        screen.getByRole("heading", { name: /tambah cabang/i });
-        expect(screen.getByPlaceholderText(/masukkan nama cabang/i)).toBeInTheDocument();
+        fireEvent.change(
+            screen.getByPlaceholderText(/masukkan nama cabang/i),
+            {
+                target: { value: "Cabang Baru" },
+            }
+        );
+
+        fireEvent.change(
+            screen.getByPlaceholderText(/masukkan alamat lengkap/i),
+            {
+                target: { value: "Jl. Baru" },
+            }
+        );
+
+        fireEvent.change(
+            screen.getByPlaceholderText(/0821/i),
+            {
+                target: { value: "08123456789" },
+            }
+        );
+
+        fireEvent.click(
+            screen.getByText(/simpan/i)
+        );
+
+        await waitFor(() => {
+            expect(API.post).toHaveBeenCalled();
+        });
+    });
+
+    test("submit edit cabang memanggil API PUT", async () => {
+        API.get.mockResolvedValue({
+            data: {
+                data: [
+                    {
+                        id: 1,
+                        name: "Dago",
+                        address: "Jl. Dago",
+                        phone: "08123",
+                        status: "active",
+                        opening_time: "08:00",
+                        closing_time: "22:00",
+                    },
+                ],
+            },
+        });
+
+        API.put.mockResolvedValue({
+            data: {
+                message: "Cabang berhasil diupdate",
+            },
+        });
+
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+            expect(screen.getAllByText("Dago")[0]).toBeInTheDocument();
+        });
+
+        fireEvent.click(
+            screen.getByText(/edit/i)
+        );
+
+        fireEvent.change(
+            screen.getByDisplayValue("Dago"),
+            {
+                target: { value: "Dago Updated" },
+            }
+        );
+
+        fireEvent.click(
+            screen.getByText(/simpan/i)
+        );
+
+        await waitFor(() => {
+            expect(API.put).toHaveBeenCalled();
+        });
+    });
+
+    test("jika API gagal tampil swal error", async () => {
+
+        const consoleSpy = vi
+            .spyOn(console, "error")
+            .mockImplementation(() => {});
+
+        API.get.mockRejectedValue(
+            new Error("Server Error")
+        );
+
+        render(
+            <MemoryRouter>
+                <Cabang />
+            </MemoryRouter>
+        );
+
+        await waitFor(() => {
+            expect(API.get).toHaveBeenCalled();
+        });
+
+        consoleSpy.mockRestore();
     });
 });

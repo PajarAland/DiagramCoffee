@@ -155,7 +155,6 @@ function VoucherManagement() {
     return (
         <div className="min-h-screen p-6">
             <div className="max-w-7xl mx-auto">
-                {/* HEADER */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800">Voucher Loyalty</h1>
@@ -166,15 +165,12 @@ function VoucherManagement() {
                     </button>
                 </div>
 
-                {/* GRID */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {vouchers.map((voucher) => (
                         <div key={voucher.id} className="relative bg-gradient-to-br from-[#2F5231] to-[#1e3a20] rounded-3xl overflow-hidden shadow-xl text-white">
-                            {/* DECORATION */}
                             <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full" />
                             <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-white/5 rounded-full" />
 
-                            {/* CONTENT */}
                             <div className="relative p-6">
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
@@ -186,13 +182,11 @@ function VoucherManagement() {
                                     </span>
                                 </div>
 
-                                {/* CODE */}
                                 <div className="mt-6 border border-dashed border-white/30 rounded-2xl px-4 py-3 bg-white/10 backdrop-blur-sm">
                                     <p className="text-xs text-white/70 mb-1">Voucher Code</p>
                                     <p className="text-xl font-bold tracking-wider">{voucher.code}</p>
                                 </div>
 
-                                {/* INFO */}
                                 <div className="mt-6 space-y-3 text-sm">
                                     <div className="flex justify-between">
                                         <span className="text-white/70">Discount</span>
@@ -208,7 +202,6 @@ function VoucherManagement() {
                                     </div>
                                 </div>
 
-                                {/* ACTION */}
                                 <div className="flex gap-3 mt-8">
                                     <button onClick={() => openEditModal(voucher)} className="flex-1 py-2.5 rounded-xl bg-white text-[#2F5231] font-semibold hover:bg-gray-100 transition-all">Edit</button>
                                     <button onClick={() => handleDelete(voucher)} className="flex-1 py-2.5 rounded-xl bg-red-500 text-white font-semibold hover:bg-red-600 transition-all">Hapus</button>
@@ -219,7 +212,6 @@ function VoucherManagement() {
                 </div>
             </div>
 
-            {/* MODAL */}
             <ModalForm
                 isOpen={isModalOpen}
                 title={mode === "create" ? "Tambah Voucher" : "Edit Voucher"}

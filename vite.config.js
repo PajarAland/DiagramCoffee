@@ -5,8 +5,14 @@ export default defineConfig({
   plugins: [react()],
 
   test: {
-    environment: "jsdom",   // penting buat React
-    globals: true,          // biar gak perlu import describe/test
+    environment: "jsdom",   
+    globals: true,         
     setupFiles: "./src/setupTests.js",
+
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "lcov"],
+      reportsDirectory: "./coverage",
+    },
   },
 })

@@ -57,7 +57,7 @@ function MyVoucher() {
                 <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Voucher Saya</h1>
-                        <p className="text-gray-500 mt-2">Kelola voucher loyalty yang telah Anda tukarkan ☕</p>
+                        <p className="text-gray-500 mt-2">Voucher loyalty kamu</p>
                     </div>
                     <button onClick={() => navigate("/voucher")} className="w-full md:w-auto bg-[#2F5231] hover:bg-[#244126] text-white px-6 py-3 rounded-2xl font-semibold transition">
                         Tukar Voucher

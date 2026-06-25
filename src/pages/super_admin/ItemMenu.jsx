@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../../services/api.js";
 import Swal from "sweetalert2";
-import iconPlusWhite from "../../assets/mdi--plus-thick-white.svg";
 import MenuCard from "../../components/ui/MenuCard.jsx";
 import ModalForm from "../../components/ui/ModalForm.jsx";
 
@@ -115,9 +114,7 @@ function ItemMenu() {
             setIsModalOpen(false);
             setIsDirty(false);
             await fetchMenus();
-        } catch (err) {
-            console.log(err.response?.data);
-
+        } catch {
             await Swal.fire({
                 icon: "error",
                 title: "Gagal",
@@ -128,7 +125,6 @@ function ItemMenu() {
 
     return (
         <main className="flex-1 p-6 overflow-auto">
-            {/* Header Section */}
             <div className="mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
@@ -146,13 +142,11 @@ function ItemMenu() {
                         }}
                         className="inline-flex items-center gap-2 bg-[#2F5231] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1e3a20] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
                     >
-                        <img src={iconPlusWhite} alt="plus" className="w-4 h-4" />
-                        Tambah Menu
+                        + Tambah Menu
                     </button>
                 </div>
             </div>
 
-            {/* Search Bar */}
             <div className="mb-6">
                 <div className="relative max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -170,7 +164,6 @@ function ItemMenu() {
                 </div>
             </div>
 
-            {/* Loading State */}
             {loading && (
                 <div className="flex items-center justify-center py-12">
                     <div className="text-center">
@@ -180,7 +173,6 @@ function ItemMenu() {
                 </div>
             )}
 
-            {/* Menu Grid */}
             {!loading && (
                 <>
                     {filtered.length > 0 ? (
@@ -191,7 +183,6 @@ function ItemMenu() {
                         </div>
                     ) : (
                         <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
-                            <div className="text-5xl mb-4">🍽️</div>
                             <p className="text-gray-500 text-sm">Menu tidak ditemukan</p>
                             {search && (
                                 <button onClick={() => setSearch("")} className="mt-3 text-[#2F5231] text-sm font-medium hover:underline">Hapus filter</button>
@@ -201,14 +192,12 @@ function ItemMenu() {
                 </>
             )}
 
-            {/* Stats Footer */}
             {!loading && items.length > 0 && (
                 <div className="mt-6 text-xs text-gray-400">
                     Menampilkan {filtered.length} dari {items.length} menu
                 </div>
             )}
 
-            {/* Modal Form */}
             <ModalForm
                 isOpen={isModalOpen}
                 title={mode === "edit" ? "Edit Menu" : "Tambah Menu"}
@@ -221,18 +210,16 @@ function ItemMenu() {
             >
                 {(handleChange) => (
                     <div className="space-y-5">
-                        {/* Category */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                                 Kategori <span className="text-red-500">*</span>
-                            </label>
+                            </p>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">📂</span></div>
                                 <select
                                     name="category_id"
                                     value={form.category_id}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer"
                                 >
                                     <option value="">-- Pilih Kategori --</option>
                                     {categories.map((cat) => (
@@ -241,94 +228,83 @@ function ItemMenu() {
                                         </option>
                                     ))}
                                 </select>
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><span className="text-gray-400">▼</span></div>
                             </div>
                         </div>
 
-                        {/* Name */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                                 Nama Menu <span className="text-red-500">*</span>
-                            </label>
+                            </p>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">🍽️</span></div>
                                 <input
                                     name="name"
                                     value={form.name}
                                     onChange={handleChange}
                                     placeholder="Masukkan nama menu"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
 
-                        {/* Description */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                                 Deskripsi
-                            </label>
+                            </p>
                             <div className="relative">
-                                <div className="absolute top-3 left-3 pointer-events-none"><span className="text-gray-400">📝</span></div>
                                 <textarea
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
                                     rows="3"
                                     placeholder="Masukkan deskripsi menu"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
 
-                        {/* Price */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                                 Harga <span className="text-red-500">*</span>
-                            </label>
+                            </p>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">💰</span></div>
                                 <input
                                     type="number"
                                     name="base_price"
                                     value={form.base_price}
                                     onChange={handleChange}
                                     placeholder="0"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
 
-                        {/* Status */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
                                 Status
-                            </label>
+                            </p>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">⚡</span></div>
                                 <select
                                     name="is_active"
                                     value={form.is_active}
                                     onChange={handleChange}
-                                    className="w-full pl-10 pr-8 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm appearance-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer"
                                 >
-                                    <option value="1">✅ Active</option>
-                                    <option value="0">⭕ Inactive</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
                                 </select>
-                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                    <span className="text-gray-400">▼</span>
-                                </div>
+                                {/* <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                </div> */}
                             </div>
                         </div>
 
-                        {/* Image Upload */}
                         <div>
-                            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Gambar Menu</label>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Gambar Menu</p>
                             <label className="flex flex-col items-center justify-center w-full min-h-[140px] border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 cursor-pointer hover:border-[#2F5231] hover:bg-[#2F5231]/5 transition-all group">
                                 <div className="flex flex-col items-center justify-center py-6">
-                                    <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">{form.image_url ? "✅" : "📸"}</span>
+                                    <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">{form.image_url ? "accepted" : "photo"}</span>
                                     <span className="text-sm font-medium text-gray-600 group-hover:text-[#2F5231] transition-colors">{form.image_url ? "Gambar siap diupload" : "Klik untuk upload gambar"}</span>
                                     <span className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG (Max 2MB)</span>
-                                    {form.image_url && form.image_url.name && (
+                                    {form.image_url?.name && (
                                         <span className="text-xs text-green-600 mt-2">
                                             {form.image_url.name}
                                         </span>

@@ -16,6 +16,8 @@ import bannerIconWhite from "../../assets/mdi--newspaper-variant-white.svg";
 import bannerIconGold from "../../assets/mdi--newspaper-variant-gold.svg";
 import voucherIconWhite from "../../assets/mdi--voucher-white.svg";
 import voucherIconGold from "../../assets/mdi--voucher-gold.svg";
+import moneyIconWhite from "../../assets/mdi--attach-money-white.svg";
+import moneyIconGold from "../../assets/mdi--attach-money-gold.svg";
 import logOutIcon from "../../assets/mdi--logout.svg";
 
 function NavItems() {
@@ -57,6 +59,12 @@ function NavItems() {
             path: "/superadmin/vouchers",
             iconWhite: voucherIconWhite,
             iconGold: voucherIconGold,
+        },
+        {
+            label: "Fees",
+            path: "/superadmin/fees",
+            iconWhite: moneyIconWhite,
+            iconGold: moneyIconGold,
         },
     ];
 

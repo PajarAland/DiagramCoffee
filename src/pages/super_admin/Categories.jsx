@@ -3,7 +3,6 @@ import Swal from "sweetalert2";
 import editIcon from "../../assets/mdi--edit.svg";
 import deleteIcon from "../../assets/mdi--delete.svg";
 import API from "../../services/api";
-import iconPlusWhite from "../../assets/mdi--plus-thick-white.svg";
 import ModalForm from "../../components/ui/ModalForm";
 
 function Categories() {
@@ -57,7 +56,6 @@ function Categories() {
                 <div class="text-left space-y-4">
                     <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-3 text-sm">
                         <div class="flex items-start gap-2">
-                            <span class="text-red-500 text-lg">⚠️</span>
                             <div class="flex-1">
                                 <p class="font-semibold text-red-700 mb-1">Peringatan!</p>
                                 <p class="text-red-600 text-xs">Data yang dihapus tidak dapat dikembalikan</p>
@@ -201,7 +199,6 @@ function Categories() {
                 title: "Berhasil Dihapus!",
                 html: `
                     <div class="text-center">
-                        <div class="text-3xl mb-2">🗑️</div>
                         <p class="text-gray-600">${category.name} telah dihapus</p>
                     </div>
                 `,
@@ -269,7 +266,6 @@ function Categories() {
 
     return (
         <main className="flex-1 p-6 overflow-auto">
-            {/* Header Section */}
             <div className="mb-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
@@ -287,13 +283,11 @@ function Categories() {
                         }}
                         className="inline-flex items-center gap-2 bg-[#2F5231] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1e3a20] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
                     >
-                        <img src={iconPlusWhite} alt="plus" className="w-4 h-4" />
-                        Tambah Kategori
+                        + Tambah Kategori
                     </button>
                 </div>
             </div>
 
-            {/* Search Bar */}
             <div className="mb-6">
                 <div className="relative max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -311,9 +305,7 @@ function Categories() {
                 </div>
             </div>
 
-            {/* Table */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                {/* Table Header */}
                 <div className="hidden md:grid grid-cols-4 bg-[#EAE5D8] px-6 py-4 text-sm font-semibold text-[#2F5231] gap-4">
                     <div>Nama Kategori</div>
                     <div>Deskripsi</div>
@@ -321,7 +313,6 @@ function Categories() {
                     <div className="text-center">Aksi</div>
                 </div>
 
-                {/* Loading State */}
                 {loading && (
                     <div className="p-12 text-center">
                         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-[#2F5231] border-t-transparent"></div>
@@ -329,10 +320,8 @@ function Categories() {
                     </div>
                 )}
 
-                {/* Table Body */}
                 {!loading && filtered.map((item) => (
                     <div key={item.id} className="block md:grid md:grid-cols-4 px-4 md:px-6 py-4 border-t border-gray-100 hover:bg-gray-50 transition-colors gap-4">
-                        {/* Mobile Card View */}
                         <div className="md:hidden space-y-2 mb-3">
                             <div className="flex justify-between items-start">
                                 <div>
@@ -351,17 +340,16 @@ function Categories() {
                             </div>
                         </div>
 
-                        {/* Desktop View */}
                         <div className="hidden md:block font-medium text-gray-800">{item.name}</div>
                         <div className="hidden md:block text-gray-600 text-sm truncate">
-                            {item.description || "—"}
+                            {item.description || "-"}
                         </div>
                         <div className="hidden md:block">
                             <span className="inline-flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full text-xs font-semibold text-gray-600">
                                 {item.sort_order || "0"}
                             </span>
                         </div>
-                        <div className="hidden md:flex items-center gap-2">
+                        <div className="hidden md:flex justify-center gap-2">
                             <button onClick={() => handleEdit(item)} className="p-2 bg-[#EAE5D8] rounded-lg hover:bg-[#dfd9c9] transition-colors" title="Edit Kategori">
                                 <img src={editIcon} alt="edit" className="w-5 h-5" />
                             </button>
@@ -372,10 +360,8 @@ function Categories() {
                     </div>
                 ))}
 
-                {/* Empty State */}
                 {!loading && filtered.length === 0 && (
                     <div className="p-12 text-center">
-                        <div className="text-4xl mb-3">📂</div>
                         <p className="text-gray-500 text-sm">Kategori tidak ditemukan</p>
                         {search && (
                             <button onClick={() => setSearch("")} className="mt-3 text-[#2F5231] text-sm font-medium hover:underline">Hapus filter</button>
@@ -384,14 +370,12 @@ function Categories() {
                 )}
             </div>
 
-            {/* Stats Footer */}
             {!loading && categories.length > 0 && (
                 <div className="mt-4 text-xs text-gray-400">
                     Menampilkan {filtered.length} dari {categories.length} kategori
                 </div>
             )}
 
-            {/* Modal Form */}
             <ModalForm
                 isOpen={isModalOpen}
                 title={mode === "edit" ? "Edit Kategori" : "Tambah Kategori"}
@@ -404,55 +388,49 @@ function Categories() {
             >
                 {(handleChange) => (
                     <div className="space-y-4">
-                        {/* Nama Kategori */}
                         <div className="group">
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                                 Nama Kategori
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">📂</span></div>
                                 <input
                                     name="name"
                                     value={form.name}
                                     onChange={handleChange}
                                     placeholder="Masukkan nama kategori"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
 
-                        {/* Deskripsi */}
                         <div className="group">
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                                 Deskripsi
                             </label>
                             <div className="relative">
-                                <div className="absolute top-3 left-3 pointer-events-none"><span className="text-gray-400">📝</span></div>
                                 <textarea
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
                                     placeholder="Masukkan deskripsi kategori"
                                     rows="3"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm resize-none focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                         </div>
 
-                        {/* Sort Order */}
                         <div className="group">
                             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
                                 Urutan Tampilan
                             </label>
                             <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><span className="text-gray-400">🔢</span></div>
                                 <input
                                     type="number"
                                     name="sort_order"
                                     value={form.sort_order}
                                     onChange={handleChange}
                                     placeholder="0"
-                                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all placeholder:text-gray-400"
                                 />
                             </div>
                             <p className="text-xs text-gray-400 mt-1">

@@ -23,7 +23,6 @@ function Register() {
         const trimmedPassword = password.trim();
         const trimmedPasswordConfirmation = passwordConfirmation.trim();
 
-        // Empty-case validation
         if (!trimmedName || !trimmedEmail || !trimmedPassword || !trimmedPasswordConfirmation) {
             Swal.fire({
                 icon: "warning",
@@ -33,7 +32,6 @@ function Register() {
             return;
         }
 
-        // Email format validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!emailRegex.test(trimmedEmail)) {
@@ -45,7 +43,6 @@ function Register() {
             return;
         }
 
-        // Password length validation
         if (trimmedPassword.length < 8) {
             Swal.fire({
                 icon: "warning",
@@ -55,7 +52,6 @@ function Register() {
             return;
         }
 
-        // Password confirmation validation
         if (trimmedPassword !== trimmedPasswordConfirmation) {
             Swal.fire({
                 icon: "warning",
@@ -65,18 +61,7 @@ function Register() {
             return;
         }
 
-        const ensureCSRF = async () => {
-            const hasCookie = document.cookie.includes("XSRF-TOKEN");
-
-            if (!hasCookie) {
-                await API.get("/sanctum/csrf-cookie");
-            }
-        };
-
         try {
-
-            ensureCSRF();
-
             await API.post("/api/register", {
                 name: trimmedName,
                 email: trimmedEmail,

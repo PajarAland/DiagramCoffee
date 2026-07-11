@@ -110,6 +110,13 @@ function Voucher() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {vouchers.map((voucher) => {
                         const enoughPoints = (user?.loyalty_points || 0) >= voucher.points_required;
+                        let buttonText = "Poin Tidak Cukup";
+
+                        if (exchangingId === voucher.id) {
+                            buttonText = "Menukar...";
+                        } else if (enoughPoints) {
+                            buttonText = "Tukar Voucher";
+                        }
                         return (
                             <div key={voucher.id} className="relative bg-white rounded-3xl overflow-hidden shadow-lg border">
                                 {/* TOP */}
@@ -141,7 +148,7 @@ function Voucher() {
                                         disabled={!enoughPoints || exchangingId === voucher.id}
                                         className={`w-full mt-6 py-3 rounded-2xl font-semibold transition-all ${enoughPoints ? "bg-[#2F5231] text-white hover:bg-[#1e3a20]" : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
                                     >
-                                        {exchangingId === voucher.id ? "Menukar..." : enoughPoints ? "Tukar Voucher" : "Poin Tidak Cukup"}
+                                        {buttonText}
                                     </button>
                                 </div>
                             </div>

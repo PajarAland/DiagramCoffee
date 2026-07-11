@@ -185,6 +185,14 @@ function OrderStatus() {
 
     const progressSteps = getProgressSteps();
 
+    let paymentStatusClass = "bg-red-100 text-red-700";
+
+    if (order.payment_status === "paid") {
+        paymentStatusClass = "bg-green-100 text-green-700";
+    } else if (order.payment_status === "pending") {
+        paymentStatusClass = "bg-yellow-100 text-yellow-700";
+    }
+
     const handleCancelOrder = async () => {
         const result = await Swal.fire({
             title: "Batalkan Pesanan?",
@@ -254,24 +262,32 @@ function OrderStatus() {
                         <div className="px-8 pt-8 pb-4 border-b border-gray-100">
                             <div className="relative">
                                 <div className="flex justify-between mb-2">
-                                    {progressSteps.map((step, idx) => (
-                                        <div key={idx} className="text-center flex-1">
-                                            <div className="relative">
-                                                <div className={`
-                                                    w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg
-                                                    transition-all duration-300 transform hover:scale-110
-                                                    ${step.isCompleted ? 'bg-green-500 text-white shadow-lg' : 
-                                                        step.isCurrent ? 'bg-[#2F5231] text-white shadow-lg ring-4 ring-[#2F5231] ring-opacity-30' : 
-                                                        'bg-gray-200 text-gray-400'}
-                                                `}>
-                                                    {step.isCompleted ? ("yes") : (<img src={step.icon} alt={step.label} className="w-5 h-5 object-contain"/>)}
+                                    {progressSteps.map((step) => {
+                                        let stepClass = "bg-gray-200 text-gray-400";
+
+                                        if (step.isCompleted) {
+                                            stepClass = "bg-green-500 text-white shadow-lg";
+                                        } else if (step.isCurrent) {
+                                            stepClass = "bg-[#2F5231] text-white shadow-lg ring-4 ring-[#2F5231] ring-opacity-30";                                                
+                                        }
+
+                                        return (
+                                            <div key={step.status} className="text-center flex-1">
+                                                <div className="relative">
+                                                    <div className={`
+                                                        w-10 h-10 mx-auto rounded-full flex items-center justify-center text-lg
+                                                        transition-all duration-300 transform hover:scale-110
+                                                        ${stepClass}
+                                                    `}>
+                                                        {step.isCompleted ? ("yes") : (<img src={step.icon} alt={step.label} className="w-5 h-5 object-contain"/>)}
+                                                    </div>
+                                                    <p className="text-xs font-medium mt-2 text-gray-600 hidden sm:block">
+                                                        {step.label}
+                                                    </p>
                                                 </div>
-                                                <p className="text-xs font-medium mt-2 text-gray-600 hidden sm:block">
-                                                    {step.label}
-                                                </p>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                                 <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 -z-10 hidden sm:block">
                                     <div 
@@ -308,11 +324,11 @@ function OrderStatus() {
                                     Payment Status
                                 </p>
                                 <div className="mt-2">
-                                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                                        order.payment_status === 'paid' ? 'bg-green-100 text-green-700' :
-                                        order.payment_status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                        'bg-red-100 text-red-700'
-                                    }`}>
+                                    <span className={`
+                                            inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold
+                                            ${paymentStatusClass}
+                                        `}
+                                    >
                                         <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                         {order.payment_status?.toUpperCase()}
                                     </span>

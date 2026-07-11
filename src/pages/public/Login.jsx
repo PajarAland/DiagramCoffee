@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/useAuth.jsx";
+import { validateLogin, 
+    handleSuccessfulLogin } from "../../utils/loginHelper.js";
 import Swal from "sweetalert2";
 import API from "../../services/api.js";
-import Navbar from "../../components/ui/NavBar.jsx";
+
 import arrowIconWhite from "../../assets/mdi--arrow-right-thin-circle-outline-white.svg";
 import emailVariantGrey from "../../assets/mdi--email-variant-grey.svg";
 
@@ -22,24 +24,7 @@ function Login() {
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
 
-        // Empty-case validation
-        if (!trimmedEmail || !trimmedPassword) {
-            Swal.fire({
-                icon: "warning",
-                title: "Form belum lengkap",
-                text: "Email dan password wajib diisi",
-            });
-            return;
-        }
-
-        const emailRegex = /^\S+@\S+\.\S+$/;
-
-        if (!emailRegex.test(trimmedEmail)) {
-            Swal.fire({
-                icon: "warning",
-                title: "Email tidak valid",
-                text: "Masukkan format email yang benar (contoh: user@email.com)",
-            });
+        if (!validateLogin(trimmedEmail, trimmedPassword)) {
             return;
         }
 
@@ -62,34 +47,12 @@ function Login() {
             });
 
             if (response.data.success) {
-                const user = response.data.data;
-
-                login(user);
-
-                if (
-                    !user.email_verified_at
-                ) {
-
-                    navigate(
-                        "/email-verification"
-                    );
-
-                    return;
-                }
-
-                if (remember) {
-                    localStorage.setItem("isLoggedIn", "true");
-                } else {
-                    sessionStorage.setItem("isLoggedIn", "true");
-                }
-
-                if (user.role === "super_admin") {
-                    navigate("/superadmin/dashboard");
-                } else if (user.role === "admin") {
-                    navigate("/admin/dashboard");
-                } else {
-                    navigate("/home");
-                }
+                handleSuccessfulLogin({
+                    user: response.data.data,
+                    remember,
+                    login,
+                    navigate,
+                });
             }
 
         } catch (error) {
@@ -148,15 +111,19 @@ function Login() {
                     />
 
                     <div className="flex items-center justify-between text-xs mt-1">
-                        <label className="flex items-center gap-2 text-[#446346]">
+                        <div className="flex items-center gap-2 text-[#446346]">
                             <input
+                                id="remember"
                                 type="checkbox"
                                 checked={remember}
                                 onChange={(e) => setRemember(e.target.checked)}
                                 className="accent-[#2F5231]"
                             />
-                            Ingat saya
-                        </label>
+
+                            <label htmlFor="remember">
+                                Ingat saya
+                            </label>
+                        </div>
 
                         <Link
                             to="/forgot-password"

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { isValidEmail } from "../../utils/validation.js";
 import Swal from "sweetalert2";
 import API from "../../services/api";
 import accountAddWhite from "../../assets/mdi--account-add-white.svg";
@@ -32,9 +33,7 @@ function Register() {
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailRegex.test(trimmedEmail)) {
+        if (!isValidEmail(trimmedEmail)) {
             Swal.fire({
                 icon: "warning",
                 title: "Email tidak valid",

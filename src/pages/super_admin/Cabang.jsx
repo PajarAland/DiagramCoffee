@@ -82,9 +82,7 @@ function Cabang() {
                         <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Cabang yang akan dihapus</p>
                         <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                                    <span class="text-red-500 text-lg">🏢</span>
-                                </div>
+                                
                                 <div>
                                     <h4 class="font-bold text-gray-800">${branch.name}</h4>
                                     <p class="text-xs text-gray-500">ID: ${branch.id}</p>

@@ -24,6 +24,12 @@ function Checkout() {
     const [previewLoading, setPreviewLoading] = useState(false);
 
     useEffect(() => {
+        if (user?.name) {
+            setCustomerName(user.name);
+        }
+    }, [user]);
+
+    useEffect(() => {
         if (!user) return;
         const fetchVouchers = async () => {
             try {
@@ -357,17 +363,16 @@ function Checkout() {
                                 <p className="text-sm text-gray-400 mt-1">Gunakan voucher untuk diskon</p>
                             </div>
                             <button onClick={() => setShowVoucherModal(false)} className="w-10 h-10 rounded-full hover:bg-gray-100 transition-all" aria-label="Tutup">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                X
                             </button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto space-y-3">
                             {vouchers.map((item) => {
                                 const voucher = item?.voucher || {};
+                                const currentSubtotal = Number(previewData?.subtotal || total);
                                 const minTransaction = Number(voucher?.min_transaction_amount || 0);
-                                const disabled = false;
+                                const disabled = currentSubtotal < minTransaction;
                                 const selected = voucherId === item.id;
 
                                 return (
@@ -376,6 +381,8 @@ function Checkout() {
                                         type="button"
                                         disabled={disabled}
                                         onClick={() => {
+                                            if (disabled) return;
+
                                             setVoucherId(item.id);
                                             setSelectedVoucher(item);
                                             setShowVoucherModal(false);

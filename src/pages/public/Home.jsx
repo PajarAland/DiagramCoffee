@@ -15,39 +15,67 @@ function Home() {
     const [recommendations, setRecommendations] = useState({ popularity: [], ibcf: [], hybrid: [] });
 
     useEffect(() => {
-        const load = async () => {
-            try {
-                const selectedBranchId = selectedBranch;
-                if (!selectedBranchId) {
-                    setLoading(false);
-                    return;
-                }
-                const [menuRes, catRes, recoRes] = await Promise.all([
-                    API.get(`/api/branches/${selectedBranchId}/menus`),
-                    API.get("/api/categories"),
-                    API.get(`/api/recommendations?branch_id=${selectedBranchId}&limit=6`),
-                ]);
-                const menus = menuRes.data.data;
-                const cats = catRes.data.data;
-                const reco = recoRes.data.data || {};
-                setMenuItems(menus);
-                setCategories(cats);
-                setRecommendations({
-                    popularity: reco.popularity || [],
-                    ibcf: reco.ibcf || [],
-                    hybrid: reco.hybrid || [],
-                });
-                if (cats.length > 0) {
-                    setActiveCategory(cats[0].name);
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
+    const loadRecommendations = async (branchId) => {
+        try {
+            const { data } = await API.get(
+                `/api/recommendations?branch_id=${branchId}&limit=6`
+            );
+
+            const reco = data.data || {};
+
+            setRecommendations({
+                popularity: reco.popularity || [],
+                ibcf: reco.ibcf || [],
+                hybrid: reco.hybrid || [],
+            });
+        } catch (err) {
+            console.error("Recommendation error:", err);
+
+            setRecommendations({
+                popularity: [],
+                ibcf: [],
+                hybrid: [],
+            });
+        }
+    };
+
+    const load = async () => {
+        try {
+            if (!selectedBranch) {
                 setLoading(false);
+                return;
             }
-        };
-        load();
-    }, [selectedBranch]);
+
+            // Only wait for the data needed to render the page
+            const [menuRes, catRes] = await Promise.all([
+                API.get(`/api/branches/${selectedBranch}/menus`),
+                API.get("/api/categories"),
+            ]);
+
+            const menus = menuRes.data.data;
+            const cats = catRes.data.data;
+
+            setMenuItems(menus);
+            setCategories(cats);
+
+            if (cats.length > 0) {
+                setActiveCategory(cats[0].name);
+            }
+
+            // Home page is ready
+            setLoading(false);
+
+            // Load recommendations in the background
+            loadRecommendations(selectedBranch);
+
+        } catch (err) {
+            console.error(err);
+            setLoading(false);
+        }
+    };
+
+    load();
+}, [selectedBranch]);
 
     const filteredItems = menuItems.filter((item) => item.category === activeCategory);
 

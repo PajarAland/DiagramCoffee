@@ -256,42 +256,62 @@ function BannerManagement() {
             >
                 {(handleChange) => (
                     <div className="space-y-4">
-                        <input
-                            type="text"
-                            name="title"
-                            placeholder="Judul Banner"
-                            value={form.title}
-                            onChange={handleChange}
-                            className="w-full border rounded-xl px-4 py-3 outline-none"
-                        />
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Judul Banner <span className="text-red-500">*</span>
+                            </p>
+                            <input
+                                type="text"
+                                name="title"
+                                placeholder="B1G1"
+                                value={form.title}
+                                onChange={handleChange}
+                                className="w-full border rounded-xl px-4 py-3 outline-none"
+                            />
+                        </div>           
 
-                        <textarea
-                            name="description"
-                            placeholder="Deskripsi"
-                            value={form.description}
-                            onChange={handleChange}
-                            rows={4}
-                            className="w-full border rounded-xl px-4 py-3 outline-none resize-none"
-                        />
-                                
-                        <input
-                            type="number"
-                            name="sort_order"
-                            placeholder="Sort Order"
-                            value={form.sort_order}
-                            onChange={handleChange}
-                            className="w-full border rounded-xl px-4 py-3 outline-none"
-                        />
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Deskripsi <span className="text-red-500">*</span>
+                            </p>
+                            <textarea
+                                name="description"
+                                placeholder="Deskripsi"
+                                value={form.description}
+                                onChange={handleChange}
+                                rows={4}
+                                className="w-full border rounded-xl px-4 py-3 outline-none resize-none"
+                            />
+                        </div>
 
-                        <select
-                            name="is_active"
-                            value={form.is_active ? "1" : "0"}
-                            onChange={(e) => setForm({ ...form, is_active: e.target.value === "1" })}
-                            className="w-full border rounded-xl px-4 py-3 outline-none"
-                        >
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Sort Order <span className="text-red-500">*</span>
+                            </p>       
+                            <input
+                                type="number"
+                                name="sort_order"
+                                placeholder="Sort Order"
+                                value={form.sort_order}
+                                onChange={handleChange}
+                                className="w-full border rounded-xl px-4 py-3 outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Status <span className="text-red-500">*</span>
+                            </p>    
+                            <select
+                                name="is_active"
+                                value={form.is_active ? "1" : "0"}
+                                onChange={(e) => setForm({ ...form, is_active: e.target.value === "1" })}
+                                className="w-full border rounded-xl px-4 py-3 outline-none"
+                            >
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
 
                         <input
                             type="file"
@@ -299,6 +319,27 @@ function BannerManagement() {
                             onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
                             className="w-full border rounded-xl px-4 py-3"
                         />
+                        {/* <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Gambar Menu</p>
+                            <label className="flex flex-col items-center justify-center w-full min-h-[140px] border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 cursor-pointer hover:border-[#2F5231] hover:bg-[#2F5231]/5 transition-all group">
+                                <div className="flex flex-col items-center justify-center py-6">
+                                    <span className="text-4xl mb-2 group-hover:scale-110 transition-transform">{form.image_url ? "accepted" : "photo"}</span>
+                                    <span className="text-sm font-medium text-gray-600 group-hover:text-[#2F5231] transition-colors">{form.image_url ? "Gambar siap diupload" : "Klik untuk upload gambar"}</span>
+                                    <span className="text-xs text-gray-400 mt-1">PNG, JPG, JPEG (Max 2MB)</span>
+                                    {form.image_url?.name && (
+                                        <span className="text-xs text-green-600 mt-2">
+                                            {form.image_url.name}
+                                        </span>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                                />
+                            </label>
+                        </div> */}
                     </div>
                 )}
             </ModalForm>

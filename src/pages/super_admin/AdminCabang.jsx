@@ -212,7 +212,7 @@ function AdminCabang() {
                 )}
 
                 {!loading && filtered.map((item) => (
-                    <div key={item.id} className="block md:grid md:grid-cols-5 px-4 md:px-6 py-4 border-t border-gray-100 items-center gap-4 hover:bg-gray-50 transition-colors">
+                    <div key={item.id} className="block md:grid md:grid-cols-4 px-4 md:px-6 py-4 border-t border-gray-100 items-center gap-4 hover:bg-gray-50 transition-colors">
                         <div className="md:hidden space-y-2">
                             <div className="flex justify-between items-start">
                                 <div>

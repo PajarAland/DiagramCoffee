@@ -52,11 +52,11 @@ function SidebarUser() {
     return (
         <>
             {/* DESKTOP SIDEBAR */}
-            <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 bg-white border-r border-[#ECE6DC] flex-col justify-between py-6 z-40">
+            <aside className="hidden lg:flex fixed top-0 left-0 h-screen w-64 bg-[#2F5231] border-r border-[#ECE6DC] flex-col justify-between py-6 z-40">
                 <div>
                     {/* LOGO */}
                     <div className="px-6 mb-10">
-                        <h1 className="text-2xl font-bold text-[#2F5231]">Diagram</h1>
+                        <h1 className="text-2xl font-bold text-white">Diagram Coffee</h1>
                     </div>
 
                     {/* NAV */}
@@ -66,7 +66,7 @@ function SidebarUser() {
                                 key={menu.path}
                                 to={menu.path}
                                 className={({ isActive }) => `flex items-center gap-3 px-4 py-3 rounded-2xl transition-all text-sm font-medium ${
-                                    isActive ? "bg-[#2F5231] text-white" : "text-[#2F5231] hover:bg-[#F5F1EA]"
+                                    isActive ? "bg-[#3B6B3D] text-[#F9C350]" : "text-white hover:bg-[#3B6B3D]"
                                 }`}
                             >
                                 {({ isActive }) => (
@@ -89,7 +89,7 @@ function SidebarUser() {
                                 console.error(err);
                             }
                         }}
-                        className="flex items-center justify-center lg:justify-start gap-3 px-3 py-3 lg:px-4 hover:bg-red-900/20 hover:text-red-400 rounded-xl w-full text-left transition-all duration-200 text-[#2F5231]"
+                        className="flex items-center justify-center lg:justify-start gap-3 px-3 py-3 lg:px-4 hover:bg-red-900/20 hover:text-red-400 rounded-xl w-full text-left transition-all duration-200 text-white"
                         title="Logout"
                     >
                         <img src={logOutIcon} alt="logout" className="w-5 h-5 shrink-0" />
@@ -99,7 +99,7 @@ function SidebarUser() {
             </aside>
 
             {/* MOBILE BOTTOM NAV */}
-            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#ECE6DC] z-50 px-2 py-2">
+            <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-[#2F5231] border-t border-[#ECE6DC] z-50 px-2 py-2">
                 <div className="grid grid-cols-4 gap-1">
                     {mobileMenus.map((menu) => (
                         <NavLink
@@ -112,7 +112,7 @@ function SidebarUser() {
                             {({ isActive }) => (
                                 <>
                                     <img src={isActive ? menu.activeIcon : menu.icon} alt={menu.label} className="w-5 h-5" />
-                                    <span className={`text-[11px] font-medium ${isActive ? "text-[#2F5231]" : "text-gray-400"}`}>
+                                    <span className={`text-[11px] font-medium ${isActive ? "text-white" : "text-gray-400"}`}>
                                         {menu.label}
                                     </span>
                                 </>

@@ -7,15 +7,20 @@ import Swal from "sweetalert2";
 function BranchStock() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
-    const [showAssignModal, setShowAssignModal] = useState(false);       
+    const [showAssignModal, setShowAssignModal] = useState(false);
     const [allMenus, setAllMenus] = useState([]);
-    const [selectedMenuId, setSelectedMenuId] = useState("");
+    const [selectedMenuIds, setSelectedMenuIds] = useState([]);
+    const [menuSearch, setMenuSearch] = useState("");
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [branchId, setBranchId] = useState(null);
     const [searchParams] = useSearchParams();
     const selectedBranchId = searchParams.get("branch");
+    const [showCopyModal, setShowCopyModal] = useState(false);
+    const [branches, setBranches] = useState([]);
+    const [sourceBranchId, setSourceBranchId] = useState("");
+    const [overwrite, setOverwrite] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -33,6 +38,8 @@ function BranchStock() {
                 if (user.role === "super_admin") {
                     const menuRes = await API.get("/api/menu-items");
                     setAllMenus(menuRes.data.data || []);
+                    const branchRes = await API.get("/api/admin/branches");
+                    setBranches(branchRes.data.data || []);
                 }
             } catch (err) {
                 console.error(err);
@@ -49,6 +56,17 @@ function BranchStock() {
     }, [selectedBranchId]);
 
     const filtered = items.filter((item) => item.menu_item?.name?.toLowerCase().includes(search.toLowerCase()));
+    const assignedIds = items.map(item => item.menu_item_id);
+
+    const availableMenus = allMenus.filter(
+        menu =>
+            !assignedIds.includes(menu.id) &&
+            menu.name.toLowerCase().includes(menuSearch.toLowerCase())
+    );
+
+    const availableBranches = branches.filter(
+        branch => branch.id !== Number(branchId)
+    );
 
     const handleUpdate = async (item) => {
         try {
@@ -86,25 +104,48 @@ function BranchStock() {
         setItems(updated);
     };
 
+    const toggleMenu = (menuId) => {
+        setSelectedMenuIds(prev =>
+            prev.includes(menuId)
+                ? prev.filter(id => id !== menuId)
+                : [...prev, menuId]
+        );
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedMenuIds.length === availableMenus.length) {
+            setSelectedMenuIds([]);
+        } else {
+            setSelectedMenuIds(availableMenus.map(menu => menu.id));
+        }
+    };
+
     const handleAssignMenu = async () => {
-        if (!selectedMenuId) {
+        if (selectedMenuIds.length === 0) {
             Swal.fire({
                 icon: "warning",
-                title: "Pilih menu",
+                title: "Pilih minimal satu menu",
             });
             return;
         }
         try {
-            await API.post(`/api/admin/branches/${branchId}/menu-items/${selectedMenuId}`);
+            const res = await API.post(`/api/admin/branches/${branchId}/menu-items`,{
+                    menu_item_ids: selectedMenuIds,
+                }
+            );
 
-            Swal.fire({
+            console.log(res.data);
+
+            await Swal.fire({
                 icon: "success",
                 title: "Berhasil",
-                text: "Menu berhasil ditambahkan",
+                text: res.data.message,
                 timer: 1200,
                 showConfirmButton: false,
             });
 
+            setSelectedMenuIds([]);
+            setMenuSearch("");
             setShowAssignModal(false);
             window.location.reload();
         } catch (err) {
@@ -114,6 +155,66 @@ function BranchStock() {
                 title: "Gagal",
                 text: err.response?.data?.message || "Gagal menambahkan menu",
             });
+        }
+    };
+
+    const handleCopyMenu = async () => {
+        if (!sourceBranchId) {
+            Swal.fire({
+                icon: "warning",
+                title: "Pilih cabang asal",
+            });
+            return;
+        }
+
+        const confirm = await Swal.fire({
+        title: "Copy Menu?",
+        text:
+            overwrite
+                ? "Menu yang sudah ada akan diperbarui."
+                : "Menu yang sudah ada akan dilewati.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Ya, Copy",
+    });
+
+if (!confirm.isConfirmed) return;
+
+        try {
+            const res = await API.post(
+                `/api/admin/branches/${branchId}/copy-menus`,
+                {
+                    source_branch_id: sourceBranchId,
+                    overwrite,
+                }
+            );
+
+            await Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: res.data.message,
+                timer: 1500,
+                showConfirmButton: false,
+            });
+
+            setShowCopyModal(false);
+            setSourceBranchId("");
+            setOverwrite(false);
+
+            window.location.reload();
+
+        } catch (err) {
+
+            console.error(err);
+
+            Swal.fire({
+                icon: "error",
+                title: "Gagal",
+                text:
+                    err.response?.data?.message ??
+                    "Gagal menyalin menu",
+            });
+
         }
     };
 
@@ -135,12 +236,21 @@ function BranchStock() {
                     </div>
 
                     {user?.role === "super_admin" && (
-                        <button
-                            onClick={() => setShowAssignModal(true)}
-                            className="bg-[#2F5231] text-white px-5 py-3 rounded-xl font-semibold hover:bg-[#1e3a20] transition-all shadow-md"
-                        >
-                            + Tambah Menu
-                        </button>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowCopyModal(true)}
+                                className="border border-[#2F5231] text-[#2F5231] px-5 py-3 rounded-xl font-semibold hover:bg-[#2F5231] hover:text-white transition-all"
+                            >
+                                Copy Menu
+                            </button>
+
+                            <button
+                                onClick={() => setShowAssignModal(true)}
+                                className="bg-[#2F5231] text-white px-5 py-3 rounded-xl font-semibold hover:bg-[#1e3a20] transition-all shadow-md"
+                            >
+                                + Tambah Menu
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -265,25 +375,146 @@ function BranchStock() {
             <ModalForm
                 isOpen={showAssignModal}
                 title="Tambah Menu Cabang"
-                form={{ selectedMenuId }}
-                setForm={(data) => setSelectedMenuId(data.selectedMenuId)}
+                form={{}}
+                setForm={() => {}}
                 onClose={() => setShowAssignModal(false)}
                 onSubmit={handleAssignMenu}
                 isDirty={false}
                 setIsDirty={() => {}}
             >
-                {(handleChange) => (
-                    <select
-                        name="selectedMenuId"
-                        value={selectedMenuId}
-                        onChange={handleChange}
-                        className="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#2F5231] focus:ring-2 focus:ring-[#2F5231]/20"
-                    >
-                        <option value="">Pilih Menu</option>
-                        {allMenus.map((menu) => (
-                            <option key={menu.id} value={menu.id}>{menu.name}</option>
-                        ))}
-                    </select>
+                {() => (
+                    <>
+                        <input
+                            type="text"
+                            placeholder="Cari menu..."
+                            value={menuSearch}
+                            onChange={(e) => setMenuSearch(e.target.value)}
+                            className="w-full border border-gray-200 rounded-xl px-4 py-3 mb-3"
+                        />
+
+                        {availableMenus.length > 0 && (
+                            <label className="flex items-center gap-3 px-3 py-2 mb-3 rounded-lg cursor-pointer">
+
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        availableMenus.length > 0 &&
+                                        selectedMenuIds.length === availableMenus.length
+                                    }
+                                    onChange={toggleSelectAll}
+                                    className="w-4 h-4 accent-[#2F5231]"
+                                />
+
+                                <span className="font-semibold text-[#2F5231]">
+                                    Pilih Semua
+                                </span>
+
+                            </label>
+                        )}
+
+                        <div className="max-h-72 overflow-y-auto border border-gray-200 rounded-xl">
+
+                            {availableMenus.length === 0 ? (
+
+                                <div className="text-center py-8 text-gray-500">
+                                    Semua menu sudah ditambahkan.
+                                </div>
+
+                            ) : (
+
+                                availableMenus.map(menu => (
+
+                                    <label
+                                        key={menu.id}
+                                        className="flex items-center gap-3 p-3 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer"
+                                    >
+
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedMenuIds.includes(menu.id)}
+                                            onChange={() => toggleMenu(menu.id)}
+                                            className="w-4 h-4 accent-[#2F5231]"
+                                        />
+
+                                        <div>
+                                            <p className="font-medium">
+                                                {menu.name}
+                                            </p>
+
+                                            <p className="text-xs text-gray-500">
+                                                {menu.category?.name}
+                                            </p>
+                                        </div>
+
+                                    </label>
+
+                                ))
+
+                            )}
+
+                        </div>
+
+                        <p className="text-sm text-gray-500 mt-3">
+                            {selectedMenuIds.length} menu dipilih
+                        </p>
+                    </>
+                )}
+            </ModalForm>
+
+            <ModalForm
+                isOpen={showCopyModal}
+                title="Copy Menu dari Cabang Lain"
+                form={{}}
+                setForm={() => {}}
+                onClose={() => setShowCopyModal(false)}
+                onSubmit={handleCopyMenu}
+                isDirty={false}
+                setIsDirty={() => {}}
+            >
+                {() => (
+                    <div>
+                        <p className="text-gray-600">
+                            Pilih cabang yang ingin Anda copy menu-nya:
+                        </p>
+                        <select
+                            value={sourceBranchId}
+                            onChange={(e) =>
+                                setSourceBranchId(
+                                    e.target.value === "" ? "" : Number(e.target.value)
+                                )
+                            }
+                            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-[#2F5231] focus:outline-none focus:ring-2 focus:ring-[#2F5231]/20 transition-all cursor-pointer mb-3"
+                        >
+                            <option value="">
+                                Pilih Cabang
+                            </option>
+
+                            {availableBranches.map(branch => (
+                                <option
+                                    key={branch.id}
+                                    value={branch.id}
+                                >
+                                    {branch.name}
+                                </option>
+                            ))}
+                        </select>
+                        <label className="flex items-center gap-3">
+
+                            <input
+                                type="checkbox"
+                                checked={overwrite}
+                                onChange={(e) =>
+                                    setOverwrite(e.target.checked)
+                                }
+                            />
+
+                            Timpa menu yang sudah ada 
+
+                        </label>
+                        <p className="text-sm text-gray-500 mt-2">
+                            Jika dicentang, stok, diskon, dan status menu akan mengikuti cabang asal.
+                        </p>
+                    </div>
                 )}
             </ModalForm>
         </main>

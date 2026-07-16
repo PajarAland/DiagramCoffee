@@ -75,65 +75,204 @@ function AdminProductDetail() {
     };
 
     const handleDelete = async () => {
-        let countdown = 5;
-        let interval;
-        const result = await Swal.fire({
-            title: "Hapus Menu ?",
-            html: `
-                <div class="text-left">
-                    <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-700 mb-4">
-                        Menu akan dihapus secara permanen.
+    const result = await Swal.fire({
+        title: "Hapus Menu",
+        html: `
+            <div class="text-left space-y-4">
+                <div class="bg-red-50 border-l-4 border-red-500 rounded-lg p-3 text-sm">
+                    <div class="flex items-start gap-2">
+                        <div class="flex-1">
+                            <p class="font-semibold text-red-700 mb-1">Peringatan!</p>
+                            <p class="text-red-600 text-xs">Data yang dihapus tidak dapat dikembalikan</p>
+                        </div>
                     </div>
-                    <div class="mb-3 text-sm text-gray-600">Ketik nama menu untuk konfirmasi:</div>
-                    <div class="bg-gray-100 rounded-xl p-3 font-semibold text-gray-800 mb-4">${form.name}</div>
-                    <input id="delete-confirm-input" class="swal2-input" placeholder="${form.name}" />
-                    <div class="text-xs text-gray-500 mt-2">Tombol delete unlock dalam <b><span id="delete-countdown">5</span> detik</b></div>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                        Menu yang akan dihapus
+                    </p>
+                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-200">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <h4 class="font-bold text-gray-800">${form.name}</h4>
+                                <p class="text-xs text-gray-500">ID: ${id}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-xs font-medium text-gray-700 mb-2">
+                        Ketik <span class="font-bold text-red-600">"${form.name}"</span> untuk konfirmasi
+                    </p>
+                    <input
+                        id="menu-confirm-input"
+                        type="text"
+                        class="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100 transition-all"
+                        placeholder="Masukkan nama menu"
+                        autocomplete="off"
+                    />
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-2 text-center">
+                    <p class="text-xs text-gray-500">
+                        Tombol hapus akan aktif dalam
+                        <span class="inline-flex items-center gap-1">
+                            <span class="font-bold text-red-600 text-sm" id="countdown">5</span>
+                            <span>detik</span>
+                        </span>
+                    </p>
+
+                    <div class="w-full bg-gray-200 rounded-full h-1 mt-2 overflow-hidden">
+                        <div
+                            id="countdown-bar"
+                            class="bg-red-500 h-1 rounded-full transition-all duration-1000"
+                            style="width:100%"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        `,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Hapus Permanen",
+        cancelButtonText: "Batal",
+        confirmButtonColor: "#dc2626",
+        cancelButtonColor: "#6B7280",
+        allowOutsideClick: false,
+        width: "450px",
+        customClass: {
+            popup: "rounded-2xl",
+            title: "text-xl font-bold text-gray-800",
+            confirmButton: "px-4 py-2 text-sm font-semibold rounded-lg",
+            cancelButton: "px-4 py-2 text-sm font-medium rounded-lg",
+        },
+        didOpen: () => {
+            const confirmBtn = Swal.getConfirmButton();
+            confirmBtn.disabled = true;
+            confirmBtn.style.opacity = "0.5";
+            confirmBtn.style.cursor = "not-allowed";
+
+            let timeLeft = 5;
+            const countdownBar = document.getElementById("countdown-bar");
+            let timerInterval;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+
+                const countdownSpan = document.getElementById("countdown");
+                if (countdownSpan) {
+                    countdownSpan.textContent = timeLeft;
+                }
+
+                if (countdownBar) {
+                    countdownBar.style.width = `${(timeLeft / 5) * 100}%`;
+
+                    if (timeLeft <= 2) {
+                        countdownBar.style.backgroundColor = "#ef4444";
+                    }
+                }
+
+                const input = document.getElementById("menu-confirm-input");
+                const isValid = input?.value === form.name;
+
+                if (timeLeft <= 0 && isValid) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.style.opacity = "1";
+                    confirmBtn.style.cursor = "pointer";
+                    clearInterval(timerInterval);
+                }
+
+                if (timeLeft <= 0) {
+                    if (countdownSpan) countdownSpan.textContent = "0";
+                }
+            }, 1000);
+
+            const input = document.getElementById("menu-confirm-input");
+
+            if (input) {
+                input.addEventListener("input", () => {
+                    const isValid = input.value === form.name;
+
+                    if (isValid && timeLeft <= 0) {
+                        confirmBtn.disabled = false;
+                        confirmBtn.style.opacity = "1";
+                        confirmBtn.style.cursor = "pointer";
+                    } else {
+                        confirmBtn.disabled = true;
+                        confirmBtn.style.opacity = "0.5";
+                        confirmBtn.style.cursor = "not-allowed";
+                    }
+
+                    if (isValid) {
+                        input.classList.remove("border-red-200");
+                        input.classList.remove("border-gray-200");
+                        input.classList.add("border-green-400", "bg-green-50");
+                    } else {
+                        input.classList.remove("border-green-400", "bg-green-50");
+                        input.classList.add("border-gray-200");
+                    }
+                });
+
+                setTimeout(() => input.focus(), 100);
+            }
+
+            window._deleteMenuTimer = timerInterval;
+        },
+        willClose: () => {
+            if (window._deleteMenuTimer) {
+                clearInterval(window._deleteMenuTimer);
+            }
+        },
+    });
+
+    if (!result.isConfirmed) return;
+
+    Swal.fire({
+        title: "Menghapus...",
+        text: "Mohon tunggu sebentar",
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+        await API.delete(`/api/admin/menu-items/${id}`);
+
+        Swal.fire({
+            icon: "success",
+            title: "Berhasil Dihapus!",
+            html: `
+                <div class="text-center">
+                    <p class="text-gray-600">${form.name} telah dihapus</p>
                 </div>
             `,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Delete Permanently",
-            cancelButtonText: "Cancel",
-            confirmButtonColor: "#dc2626",
-            allowOutsideClick: false,
-            didOpen: () => {
-                const confirmBtn = Swal.getConfirmButton();
-                confirmBtn.disabled = true;
-                const input = document.getElementById("delete-confirm-input");
-                interval = setInterval(() => {
-                    countdown--;
-                    const countdownEl = document.getElementById("delete-countdown");
-                    if (countdownEl) countdownEl.textContent = countdown;
-                    if (countdown <= 0 && input.value === form.name) confirmBtn.disabled = false;
-                    if (countdown <= 0) clearInterval(interval);
-                }, 1000);
-                input.addEventListener("input", () => {
-                    confirmBtn.disabled = !(input.value === form.name && countdown <= 0);
-                });
-            },
-            willClose: () => clearInterval(interval),
+            confirmButtonColor: "#2F5231",
+            confirmButtonText: "OK",
+            timer: 2000,
+            showConfirmButton: true,
         });
-        if (!result.isConfirmed) return;
 
-        try {
-            await API.delete(`/api/admin/menu-items/${id}`);
+        navigate("/superadmin/item-menu");
+    } catch (err) {
+        console.error("Delete error:", err);
 
-            await Swal.fire({
-                icon: "success",
-                title: "Menu Deleted",
-                text: `${form.name} berhasil dihapus`,
-                confirmButtonColor: "#2F5231",
-            });
-            navigate("/superadmin/item-menu");
-        } catch (err) {
-            console.error(err);
-
-            Swal.fire({
-                icon: "error",
-                title: "Gagal menghapus menu",
-            });
-        }
-    };
+        Swal.fire({
+            icon: "error",
+            title: "Gagal Menghapus",
+            html: `
+                <div class="text-center">
+                    <p class="text-gray-600 mb-2">Terjadi kesalahan saat menghapus menu</p>
+                    <p class="text-xs text-gray-400">
+                        ${err?.response?.data?.message || "Silakan coba lagi"}
+                    </p>
+                </div>
+            `,
+            confirmButtonColor: "#2F5231",
+            confirmButtonText: "OK",
+        });
+    }
+};
 
     const handleSubmit = async () => {
         try {
@@ -162,11 +301,14 @@ function AdminProductDetail() {
             });
             navigate("/superadmin/item-menu");
         } catch (err) {
-            console.error(err);
+            console.log(err.response?.data);
 
             Swal.fire({
                 icon: "error",
                 title: "Gagal update data",
+                text:
+                    err.response?.data?.message ??
+                    "Unknown error",
             });
         } finally {
             setSaving(false);

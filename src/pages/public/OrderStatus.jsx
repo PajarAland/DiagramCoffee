@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import cardClockIcon from "../../assets/mdi--credit-card-clock-outline.svg"; 
 import coffeeMakerIcon from "../../assets/mdi--coffee-maker-check.svg"; 
 import checkMarkIcon from "../../assets/mdi--check-circle.svg"; 
+import checkMarkIconWhite from "../../assets/mdi--check-circle-white.svg"; 
 import finishFlagIcon from "../../assets/mdi--flag-checkered.svg"; 
 import bellIcon from "../../assets/mdi--bell-alert.svg"; 
 import cancelIcon from "../../assets/mdi--cancel-circle.svg";
@@ -279,7 +280,19 @@ function OrderStatus() {
                                                         transition-all duration-300 transform hover:scale-110
                                                         ${stepClass}
                                                     `}>
-                                                        {step.isCompleted ? ("yes") : (<img src={step.icon} alt={step.label} className="w-5 h-5 object-contain"/>)}
+                                                        {step.isCompleted ? (
+                                                            <img
+                                                                src={checkMarkIconWhite}
+                                                                alt="completed"
+                                                                className="w-5 h-5 object-contain"
+                                                            />
+                                                        ) : (
+                                                            <img
+                                                                src={step.icon}
+                                                                alt={step.label}
+                                                                className="w-5 h-5 object-contain"
+                                                            />
+                                                        )}
                                                     </div>
                                                     <p className="text-xs font-medium mt-2 text-gray-600 hidden sm:block">
                                                         {step.label}
@@ -463,7 +476,7 @@ function OrderStatus() {
                                     onClick={() => window.location.reload()}
                                     className="px-6 py-3 rounded-xl border-2 border-[#2F5231] text-[#2F5231] text-sm font-semibold hover:bg-[#2F5231] hover:text-white transition-all duration-200"
                                 >
-                                    🔄 Refresh
+                                    Refresh
                                 </button>
                             )}
                         </div>

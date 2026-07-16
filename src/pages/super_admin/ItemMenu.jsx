@@ -14,6 +14,8 @@ function ItemMenu() {
     const [mode, setMode] = useState("edit");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [csvFile, setCsvFile] = useState(null);
+    const [showImportModal, setShowImportModal] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
 
     const [form, setForm] = useState({
@@ -123,6 +125,133 @@ function ItemMenu() {
         }
     };
 
+    const handleImport = async () => {
+        if (!csvFile) {
+            await Swal.fire({
+                icon: "warning",
+                title: "Pilih file",
+                text: "Silakan pilih file CSV terlebih dahulu.",
+            });
+            return;
+        }
+
+        const confirm = await Swal.fire({
+            title: "Import data?",
+            text: "Pastikan data sudah benar",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, import",
+        });
+
+        if (!confirm.isConfirmed) return;
+
+        try {
+            const formData = new FormData();
+            formData.append("file", csvFile);
+
+            const res = await API.post(
+                "/api/admin/menu-items/import",
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            await Swal.fire({
+                icon: "success",
+                title: "Import Berhasil",
+                text: res.data.message,
+            });
+
+            await fetchMenus();
+            setCsvFile(null);
+            setShowImportModal(false);
+
+        } catch (err) {
+            console.error(err);
+            console.log(err.response?.data);
+            await Swal.fire({
+                icon: "error",
+                title: "Import Gagal",
+                text: err.response?.data?.message || "Terjadi kesalahan saat mengimpor data.",
+            });
+        }
+    };
+
+    const handleExport = async () => {
+        const confirm = await Swal.fire({
+            title: "Unduh data?",
+            text: "Apakah anda ingin mengunduh data menu?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Ya, unduh",
+        });
+
+        if (!confirm.isConfirmed) return;
+        try {
+            const response = await API.get(
+                "/api/admin/menu-items/export",
+                {
+                    responseType: "blob",
+                }
+            );
+
+            const blob = new Blob([response.data], {
+                type: "text/csv;charset=utf-8;",
+            });
+
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+
+            // ambil filename dari backend kalau ada
+            const disposition = response.headers["content-disposition"];
+
+            let filename = "menu-export.csv";
+
+            if (disposition) {
+                const match = disposition.match(/filename="?([^"]+)"?/);
+
+                if (match) {
+                    filename = match[1];
+                }
+            }
+
+            link.setAttribute("download", filename);
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            link.remove();
+
+            window.URL.revokeObjectURL(url);
+
+            await Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: "File CSV berhasil diunduh.",
+                timer: 1200,
+                showConfirmButton: false,
+            });
+
+        } catch (err) {
+
+            console.error(err);
+
+            await Swal.fire({
+                icon: "error",
+                title: "Export Gagal",
+                text:
+                    err.response?.data?.message ??
+                    "Terjadi kesalahan saat mengunduh CSV.",
+            });
+        }
+    };
+
     return (
         <main className="flex-1 p-6 overflow-auto">
             <div className="mb-8">
@@ -132,7 +261,40 @@ function ItemMenu() {
                         <p className="text-sm text-gray-500 mt-1">Kelola semua menu makanan & minuman</p>
                     </div>
 
-                    <button
+                    {/* <button
+                        onClick={() => {
+                            setMode("add");
+                            setSelectedItem(null);
+                            setForm({ category_id: "", name: "", description: "", base_price: "", is_active: "1", image_url: null });
+                            setIsDirty(false);
+                            setIsModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-2 bg-[#2F5231] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1e3a20] transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-sm"
+                    >
+                        + Tambah Menu
+                    </button> */}
+
+                    <div className="flex gap-3">
+                        <button
+                            className="border border-[#2F5231] text-[#2F5231] px-5 py-3 rounded-xl font-semibold hover:bg-[#2F5231] hover:text-white transition-all"
+                            onClick={handleExport}
+                        >
+                            Export CSV
+                        </button>
+
+                        <button
+                            className="border border-[#2F5231] text-[#2F5231] px-5 py-3 rounded-xl font-semibold hover:bg-[#2F5231] hover:text-white transition-all"
+
+                            onClick={() => {
+                                setCsvFile(null);
+                                setShowImportModal(true);
+                                
+                            }}
+                        >
+                            Import CSV
+                        </button>
+
+                        <button
                         onClick={() => {
                             setMode("add");
                             setSelectedItem(null);
@@ -144,6 +306,8 @@ function ItemMenu() {
                     >
                         + Tambah Menu
                     </button>
+
+                    </div>
                 </div>
             </div>
 
@@ -292,8 +456,6 @@ function ItemMenu() {
                                     <option value="1">Active</option>
                                     <option value="0">Inactive</option>
                                 </select>
-                                {/* <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                </div> */}
                             </div>
                         </div>
 
@@ -327,6 +489,48 @@ function ItemMenu() {
                     </div>
                 )}
             </ModalForm>
+
+            {showImportModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    <div
+                        className="absolute inset-0 bg-black/40"
+                        onClick={() => setShowImportModal(false)}
+                    />
+
+                    <div className="relative bg-white rounded-2xl w-full max-w-md p-6">
+                        <h2 className="text-xl font-bold">
+                            Import Menu CSV
+                        </h2>
+
+                        <p className="text-sm text-gray-500 mt-2">
+                            Upload file CSV sesuai format yang ditentukan.
+                        </p>
+
+                        <input
+                            type="file"
+                            accept=".csv"
+                            className="mt-5"
+                            onChange={(e) => {
+                                setCsvFile(e.target.files[0]);
+                            }}
+                        />
+
+                        <div className="flex justify-end gap-3 mt-6">
+                            <button
+                                onClick={() => setShowImportModal(false)}
+                            >
+                                Batal
+                            </button>
+
+                            <button
+                                onClick={handleImport}
+                            >
+                                Import
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }

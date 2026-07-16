@@ -278,46 +278,63 @@ function FeeManagement() {
             >
                 {(handleChange) => (
                     <div className="space-y-4">
-                        <input
-                            name="key"
-                            value={form.key}
-                            disabled={isEdit}
-                            onChange={handleChange}
-                            placeholder="admin_fee"
-                            className="w-full px-4 py-3 border rounded-xl"
-                        />
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Key <span className="text-red-500">*</span>
+                            </p>
+                            <input
+                                name="key"
+                                value={form.key}
+                                disabled={isEdit}
+                                onChange={handleChange}
+                                placeholder="admin_fee"
+                                className="w-full px-4 py-3 border rounded-xl"
+                            />
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Label <span className="text-red-500">*</span>
+                            </p>
+                            <input
+                                name="label"
+                                value={form.label}
+                                onChange={handleChange}
+                                placeholder="Admin Fee"
+                                className="w-full px-4 py-3 border rounded-xl"
+                            />
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Value <span className="text-red-500">*</span>
+                            </p>
+                            <input
+                                name="value"
+                                type="number"
+                                value={form.value}
+                                onChange={handleChange}
+                                placeholder="2000"
+                                className="w-full px-4 py-3 border rounded-xl"
+                            />
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Type <span className="text-red-500">*</span>
+                            </p>
+                            <select
+                                name="type"
+                                value={form.type}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 border rounded-xl"
+                            >
+                                <option value="fixed">
+                                    Fixed
+                                </option>
 
-                        <input
-                            name="label"
-                            value={form.label}
-                            onChange={handleChange}
-                            placeholder="Admin Fee"
-                            className="w-full px-4 py-3 border rounded-xl"
-                        />
-
-                        <input
-                            name="value"
-                            type="number"
-                            value={form.value}
-                            onChange={handleChange}
-                            placeholder="2000"
-                            className="w-full px-4 py-3 border rounded-xl"
-                        />
-
-                        <select
-                            name="type"
-                            value={form.type}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 border rounded-xl"
-                        >
-                            <option value="fixed">
-                                Fixed
-                            </option>
-
-                            <option value="percentage">
-                                Percentage
-                            </option>
-                        </select>
+                                <option value="percentage">
+                                    Percentage
+                                </option>
+                            </select>
+                        </div>
                     </div>
                 )}
             </ModalForm>

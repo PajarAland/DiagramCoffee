@@ -313,12 +313,18 @@ function BannerManagement() {
                             </select>
                         </div>
 
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
-                            className="w-full border rounded-xl px-4 py-3"
-                        />
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Gambar Banner <span className="text-red-500">*</span>
+                            </p> 
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+                                className="w-full border rounded-xl px-4 py-3"
+                            />
+                        </div>
+                        
                         {/* <div>
                             <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Gambar Menu</p>
                             <label className="flex flex-col items-center justify-center w-full min-h-[140px] border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 cursor-pointer hover:border-[#2F5231] hover:bg-[#2F5231]/5 transition-all group">

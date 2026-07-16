@@ -10,7 +10,7 @@ import userEditGrey from "../../assets/mdi--user-edit-grey.svg";
 
 function Register() {
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -61,6 +61,7 @@ function Register() {
         }
 
         try {
+            setLoading(true);
             await API.post("/api/register", {
                 name: trimmedName,
                 email: trimmedEmail,
@@ -92,6 +93,8 @@ function Register() {
                     text: error.response?.data?.message || "Terjadi kesalahan",
                 });
             }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -168,7 +171,7 @@ function Register() {
                         />
                     </div>
 
-                    <button
+                    {/* <button
                         type="submit"
                         className="w-10/12 mx-auto bg-[#2F5231] text-sm text-white py-2 rounded-lg mt-4 relative flex items-center justify-center"
                     >
@@ -179,6 +182,39 @@ function Register() {
                             alt="account add"
                             className="w-6 h-6 absolute right-4"
                         />
+                    </button> */}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className={`
+                            w-10/12 mx-auto
+                            py-2 rounded-lg mt-2
+                            relative flex items-center justify-center
+                            transition-all duration-200
+                            ${
+                                loading
+                                    ? "bg-[#5C7A5E] cursor-not-allowed opacity-70"
+                                    : "bg-[#2F5231] hover:bg-[#446346]"
+                            }
+                            text-white
+                        `}
+                    >
+                        {loading ? (
+                            <div className="flex items-center gap-2">
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                <span>Loading...</span>
+                            </div>
+                        ) : (
+                            <>
+                                <span className="text-center">Buat Akun</span>
+
+                                <img
+                                    src={accountAddWhite}
+                                    alt="arrow"
+                                    className="w-6 h-6 absolute right-4"
+                                />
+                            </>
+                        )}
                     </button>
                 </form>
 

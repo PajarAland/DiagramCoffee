@@ -224,15 +224,47 @@ function VoucherManagement() {
             >
                 {(handleChange) => (
                     <div className="space-y-4">
-                        <input type="text" name="name" placeholder="Nama Voucher" value={form.name} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
-                        <input type="text" name="code" placeholder="Kode Voucher" value={form.code} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none uppercase" />
-                        <input type="number" name="discount_amount" placeholder="Jumlah Diskon" value={form.discount_amount} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
-                        <input type="number" name="min_transaction_amount" placeholder="Minimal Transaksi" value={form.min_transaction_amount} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
-                        <input type="number" name="points_required" placeholder="Point Required" value={form.points_required} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
-                        <select name="is_active" value={form.is_active ? "1" : "0"} onChange={(e) => setForm({ ...form, is_active: e.target.value === "1" })} className="w-full border rounded-xl px-4 py-3 outline-none">
-                            <option value="1">Active</option>
-                            <option value="0">Inactive</option>
-                        </select>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Nama Voucher <span className="text-red-500">*</span>
+                            </p>
+                            <input type="text" name="name" placeholder="Nama Voucher" value={form.name} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Kode Voucher <span className="text-red-500">*</span>
+                            </p>
+                            <input type="text" name="code" placeholder="Kode Voucher" value={form.code} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none uppercase" />
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Jumlah Diskon <span className="text-red-500">*</span>
+                            </p>
+                            <input type="number" name="discount_amount" placeholder="Jumlah Diskon" value={form.discount_amount} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Minimal Transaksi <span className="text-red-500">*</span>
+                            </p>
+                            <input type="number" name="min_transaction_amount" placeholder="Minimal Transaksi" value={form.min_transaction_amount} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
+
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Points Required <span className="text-red-500">*</span>
+                            </p>
+                            <input type="number" name="points_required" placeholder="Point Required" value={form.points_required} onChange={handleChange} className="w-full border rounded-xl px-4 py-3 outline-none" />
+
+                        </div>
+                        <div>
+                            <p className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+                                Status <span className="text-red-500">*</span>
+                            </p>
+                            <select name="is_active" value={form.is_active ? "1" : "0"} onChange={(e) => setForm({ ...form, is_active: e.target.value === "1" })} className="w-full border rounded-xl px-4 py-3 outline-none">
+                                <option value="1">Active</option>
+                                <option value="0">Inactive</option>
+                            </select>
+                        </div>
                     </div>
                 )}
             </ModalForm>

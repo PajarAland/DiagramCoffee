@@ -105,13 +105,14 @@ function OrderHub() {
     const handleConfirmCash = async (order) => {
         try {
             await API.post(`/api/admin/orders/${order.id}/confirm-cash`);
-            Swal.fire({
+            await Swal.fire({
                 icon: "success",
                 title: "Pembayaran dikonfirmasi",
                 timer: 1200,
                 showConfirmButton: false,
             });
-            await fetchOrders();
+            // await fetchOrders();
+            window.location.reload();
         } catch (err) {
             console.error(err);
 
@@ -139,13 +140,14 @@ function OrderHub() {
 
         try {
             await API.post(`/api/orders/${selectedOrder.id}/cancel`);
-            Swal.fire({
+            await Swal.fire({
                 icon: "success",       
                 title: "Pesanan dibatalkan",
                 timer: 1200,                 
                 showConfirmButton: false,    
             });
-            await fetchOrders();
+            // await fetchOrders();
+            window.location.reload();
         } catch (err) {
             console.error(err);
             Swal.fire({
@@ -160,13 +162,14 @@ function OrderHub() {
         if (!selectedOrder) return;
         try {
             await API.put(`/api/admin/orders/${selectedOrder.id}/status`, { status });
-            Swal.fire({
+            await Swal.fire({
                 icon: "success",
                 title: "Status updated",
                 timer: 1200,
                 showConfirmButton: false,
             });
-            await fetchOrders();
+            // await fetchOrders();
+            window.location.reload();
         } catch (err) {
             console.error(err);
 

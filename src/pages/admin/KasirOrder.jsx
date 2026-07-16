@@ -147,12 +147,15 @@ function KasirOrder() {
                 setInvoiceUrl(order.xendit_invoice_url);
                 setShowPaymentModal(true);
             } else {
-
-                Swal.fire({
+                await Swal.fire({
                     icon: "success",
                     title: "Berhasil",
                     text: response.data.message || "Pesanan berhasil dibuat",
+                    showConfirmButton: false,
+                    timer: 1500,
                 });
+
+                window.location.reload();
             }
 
             setCart([]);

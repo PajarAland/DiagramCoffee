@@ -9,6 +9,16 @@ function MenuCard({ item, onClick }) {
         setImageError(true);
     };
 
+    const getImageUrl = (url) => {
+        if (!url) return null;
+        // Jika sudah dari R2/S3 (ada http/https), langsung pakai
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Jika masih data lokal lama, tambahkan base url
+        return `${baseImageUrl}${url.startsWith('/') ? '' : '/'}${url}`; 
+    };
+
     const formatPrice = (price) => {
         if (!price && price !== 0) return "Price not available";
         return new Intl.NumberFormat("id-ID", {
@@ -49,7 +59,7 @@ function MenuCard({ item, onClick }) {
             <div className="relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
                 {!imageError && item.image_url ? (
                     <img
-                        src={`${baseImageUrl}${item.image_url}`}
+                        src={getImageUrl(item.image_url)}
                         alt={item.name || "Menu item"}
                         className="w-full h-32 object-cover transition-transform duration-500 group-hover:scale-110"
                         onError={handleImageError}

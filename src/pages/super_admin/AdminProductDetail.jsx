@@ -21,6 +21,16 @@ function AdminProductDetail() {
 
     const baseImageUrl = `${import.meta.env.VITE_API_URL}/storage/`;
 
+    const getImageUrl = (url) => {
+        if (!url) return null;
+        // Jika sudah dari R2/S3 (ada http/https), langsung pakai
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Jika masih data lokal lama, tambahkan base url
+        return `${baseImageUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
+
     const fetchCategories = useCallback(async () => {
         const res = await API.get("/api/categories");
         setCategories(res.data.data);
@@ -37,8 +47,8 @@ function AdminProductDetail() {
             is_active: item.is_active,
             image_url: item.image_url,
         });
-        setImagePreview(`${baseImageUrl}${item.image_url}`);
-    }, [id, baseImageUrl]);
+        setImagePreview(getImageUrl(item.image_url));
+    }, [id, baseImageUrl, getImageUrl]);
 
     useEffect(() => {
         const load = async () => {

@@ -12,6 +12,16 @@ function BannerCarousel() {
     const [loading, setLoading] = useState(true);
     const baseImageUrl = `${import.meta.env.VITE_API_URL}/storage/`;
 
+    const getImageUrl = (url) => {
+        if (!url) return null;
+        // Jika sudah dari R2/S3 (ada http/https), langsung pakai
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Jika masih data lokal lama, tambahkan base url
+        return `${baseImageUrl}${url.startsWith('/') ? '' : '/'}${url}`; 
+    };
+
     useEffect(() => {
         const fetchBanners = async () => {
             try {
@@ -48,7 +58,7 @@ function BannerCarousel() {
                     <SwiperSlide key={banner.id}>
                         <div className="relative w-full h-full">
                             <img
-                                src={`${baseImageUrl}${banner.image_url}`}
+                                src={getImageUrl(banner.image_url)}
                                 alt={banner.title}
                                 fetchPriority="high"
                                 className="w-full h-full object-cover"

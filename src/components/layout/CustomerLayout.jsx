@@ -1,7 +1,7 @@
 import { Outlet, useLocation, } from "react-router-dom";
 import { useEffect } from "react";
 import TitleBar from "../ui/TitleBar.jsx";
-import SidebarUser from "../ui/SidebarCustomer.jsx";
+import SidebarUser from "../ui/SideBarCustomer.jsx";
 
 function CustomerLayout() {
     const location = useLocation();

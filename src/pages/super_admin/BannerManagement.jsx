@@ -21,6 +21,16 @@ function BannerManagement() {
 
     const baseImageUrl = `${import.meta.env.VITE_API_URL}/storage/`;
 
+    const getImageUrl = (url) => {
+        if (!url) return null;
+        // Jika sudah dari R2/S3 (ada http/https), langsung pakai
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return url;
+        }
+        // Jika masih data lokal lama, tambahkan base url
+        return `${baseImageUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+    };
+
     const fetchData = useCallback(async () => {
         try {
             setLoading(true);
@@ -203,7 +213,7 @@ function BannerManagement() {
                             {/* IMAGE */}
                             <div className="h-52 overflow-hidden bg-gray-100">
                                 <img
-                                    src={`${baseImageUrl}${banner.image_url}`}
+                                    src={getImageUrl(banner.image_url)}
                                     alt={banner.title}
                                     className="w-full h-full object-cover" 
                                         
